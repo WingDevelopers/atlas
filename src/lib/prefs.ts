@@ -6,10 +6,12 @@ export interface Prefs {
   text: 'normal' | 'large'
   motion: 'system' | 'reduce'
   welcomed: boolean
+  /** Quick tour seen (or skipped). */
+  toured: boolean
 }
 
 const KEY = 'atlas.prefs'
-const DEFAULTS: Prefs = { name: '', text: 'normal', motion: 'system', welcomed: false }
+const DEFAULTS: Prefs = { name: '', text: 'normal', motion: 'system', welcomed: false, toured: false }
 const listeners = new Set<() => void>()
 
 function read(): Prefs {

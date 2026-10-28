@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { backupFileName, exportBackup, importBackup, readBackup, type BackupManifest, type ImportMode } from '../db/backup'
 import { getDb, isDemoMode } from '../db/db'
 import { enterDemo, exitDemo, removeDemoData } from '../db/demo'
@@ -7,7 +8,7 @@ import { wipeAll } from '../db/repo'
 import { bytes, fmtDate } from '../lib/format'
 import { setPrefs, usePrefs } from '../lib/prefs'
 import { stats, useAll } from '../lib/queries'
-import { IconCamera, IconCompassMark, IconDownload, IconShield, IconSparkle, IconText, IconTrash, IconUpload } from '../ui/icons'
+import { IconBook, IconCamera, IconCompassMark, IconDownload, IconHelp, IconShield, IconSparkle, IconText, IconTrash, IconUpload } from '../ui/icons'
 import { Loading, PageTitle, Segmented, Sheet, useConfirm, useToast } from '../ui/primitives'
 
 const LAST_BACKUP = 'atlas.lastBackup'
@@ -45,6 +46,7 @@ export default function Me() {
   const toast = useToast()
   const confirm = useConfirm()
   const demo = isDemoMode()
+  const navigate = useNavigate()
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState('')
   const [storage, setStorage] = useState<{ usage?: number; quota?: number; persisted?: boolean }>({})
@@ -179,6 +181,20 @@ export default function Me() {
       <p className="pad xs muted" style={{ marginTop: 8 }}>
         Counted from your entries. Countries come from the “Country” field on visited places.
       </p>
+
+      <Group title="Help">
+        <Setting icon={<IconBook />} bg="var(--sun-tint)" title="How ATLAS works" sub="Every screen, entry type and how they connect." onClick={() => navigate('/guide')} />
+        <Setting
+          icon={<IconHelp />}
+          bg="var(--sea-tint)"
+          title="Replay the quick tour"
+          sub="A one-minute walk through the tabs."
+          onClick={() => {
+            setPrefs({ toured: false })
+            navigate('/')
+          }}
+        />
+      </Group>
 
       <Group title="Backup">
         <Setting

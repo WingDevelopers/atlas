@@ -18,6 +18,12 @@ milestones and dreams, on a real map — stored only on your own device.
 - **iPhone tip:** add ATLAS to your Home Screen (Share → *Add to Home Screen*). Safari can
   clear website data that hasn't been opened for a few weeks; Home Screen apps are kept.
 
+## Learning the app
+
+A one-minute **quick tour** runs the first time you open Home (replay it from Me → Help). The full
+**How ATLAS works** guide — every tab, entry type, how they connect, and step-by-step recipes — is
+under Me → Help, or the **?** button on Home.
+
 ## Run it on your computer
 
 You need [Node.js](https://nodejs.org) (the "LTS" version) installed once.

@@ -1612,3 +1612,317 @@ button.card:active {
 .leaflet-tile-pane {
   filter: sepia(0.22) saturate(0.85) brightness(1.02);
 }
+
+/* ==========================================================================
+   Quick tour
+   ========================================================================== */
+.tour-backdrop {
+  position: fixed;
+  inset: 0 0 calc(var(--tabbar-h) + var(--safe-b)) 0;
+  z-index: 45;
+  background: rgba(40, 46, 42, 0.5);
+  animation: fade var(--t-med) var(--ease);
+}
+.tour-card {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--tabbar-h) + var(--safe-b) + 92px);
+  width: min(440px, calc(100vw - 32px));
+  background: var(--ivory);
+  border-radius: var(--r-xl);
+  padding: var(--s5);
+  box-shadow: var(--shadow-lg);
+  animation: tour-in var(--t-med) var(--ease);
+  outline: none;
+}
+@keyframes tour-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+.tour-card h2 {
+  font-size: var(--fs-2xl);
+  margin-top: var(--s3);
+}
+.tour-card p {
+  margin-top: var(--s2);
+  color: var(--text-muted);
+}
+.tour-ic {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--coral-tint);
+  color: #8d3f2c;
+  display: grid;
+  place-items: center;
+}
+.tour-ic svg {
+  width: 24px;
+  height: 24px;
+}
+.tour-dots {
+  display: flex;
+  gap: 6px;
+}
+.tour-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  transition: width var(--t-fast);
+}
+.tour-dots span.on {
+  width: 20px;
+  border-radius: 4px;
+  background: var(--coral-deep);
+}
+:root[data-tour] .tabbar {
+  pointer-events: none;
+}
+:root[data-tour] .tab {
+  opacity: 0.35;
+  transition: opacity var(--t-med);
+}
+:root[data-tour='/map'] .tab[href='#/map'],
+:root[data-tour='/dreams'] .tab[href='#/dreams'],
+:root[data-tour='/archive'] .tab[href='#/archive'],
+:root[data-tour='/me'] .tab[href='#/me'] {
+  opacity: 1;
+  color: var(--coral-ink);
+}
+:root[data-tour='/map'] .tab[href='#/map']::after,
+:root[data-tour='/dreams'] .tab[href='#/dreams']::after,
+:root[data-tour='/archive'] .tab[href='#/archive']::after,
+:root[data-tour='/me'] .tab[href='#/me']::after {
+  content: '';
+  position: absolute;
+  inset: 4px 10%;
+  border-radius: 16px;
+  border: 2px solid var(--coral);
+  animation: tour-pulse 1.6s ease-in-out infinite;
+}
+:root[data-tour='fab'] .fab {
+  z-index: 48;
+  pointer-events: none;
+  animation: fab-ring 1.6s ease-in-out infinite;
+}
+@keyframes fab-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(245, 240, 230, 0.95), 0 0 0 8px rgba(215, 124, 102, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(245, 240, 230, 0.95), 0 0 0 14px rgba(215, 124, 102, 0);
+  }
+}
+:root[data-tour]:not([data-tour='fab']) .fab {
+  z-index: 44;
+}
+@keyframes tour-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ==========================================================================
+   Guide
+   ========================================================================== */
+.guide-hero {
+  padding-top: var(--s2);
+  padding-bottom: var(--s4);
+}
+.guide-hero h1 {
+  font-size: var(--fs-3xl);
+  line-height: 1.08;
+}
+.guide-hero > p {
+  margin-top: var(--s3);
+}
+.guide-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--s5);
+}
+.guide-toc a {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  padding: 6px 12px;
+  font-size: var(--fs-sm);
+  font-weight: 560;
+  color: var(--charcoal);
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+.guide-section {
+  padding: var(--s8) var(--s5) 0;
+  scroll-margin-top: 12px;
+}
+.guide-section > .eyebrow {
+  color: var(--coral-ink);
+}
+.guide-section > h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-2xl);
+  margin-top: 4px;
+}
+.guide-section > * + * {
+  margin-top: var(--s4);
+}
+.guide-intro {
+  color: var(--text-muted);
+}
+.guide-list {
+  margin: 0;
+  padding-left: 1.1em;
+}
+.guide-list li + li {
+  margin-top: 6px;
+}
+.guide-steps {
+  counter-reset: g;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.guide-steps li {
+  counter-increment: g;
+  position: relative;
+  padding-left: 40px;
+  min-height: 28px;
+}
+.guide-steps li + li {
+  margin-top: 10px;
+}
+.guide-steps li::before {
+  content: counter(g);
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sun-tint);
+  color: #7a5517;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  display: grid;
+  place-items: center;
+}
+.guide-dl {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 8px 12px;
+  margin: 0;
+}
+.guide-dl dt {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-top: 3px;
+}
+.guide-dl dd {
+  margin: 0;
+}
+.guide-try {
+  align-self: flex-start;
+}
+.fold {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.fold summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s3) var(--s4);
+  min-height: 64px;
+  cursor: pointer;
+}
+.fold summary::-webkit-details-marker {
+  display: none;
+}
+.fold summary .ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.fold summary .ic svg {
+  width: 20px;
+  height: 20px;
+}
+.fold summary .body {
+  flex: 1;
+  min-width: 0;
+}
+.fold summary .body b {
+  display: block;
+  font-weight: 640;
+}
+.fold summary .body span {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.fold summary .chev {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--text-muted);
+  transition: transform var(--t-fast);
+}
+.fold[open] summary .chev {
+  transform: rotate(90deg);
+}
+.fold-body {
+  padding: 0 var(--s4) var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+.diagram {
+  margin: var(--s4) 0 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--s3) var(--s3) var(--s4);
+}
+.diagram svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.diagram figcaption {
+  text-align: center;
+  margin-top: 4px;
+}
+.dg-label {
+  font: 650 14px var(--font-ui);
+  fill: var(--charcoal);
+}
+.dg-sub {
+  font: 500 10.5px var(--font-ui);
+  fill: var(--text-muted);
+}
+.dg-tag {
+  font: 600 10px var(--font-ui);
+  fill: var(--sea-ink);
+  letter-spacing: 0.02em;
+}
+.help-link {
+  margin-left: auto;
+}

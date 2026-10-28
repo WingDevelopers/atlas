@@ -11,6 +11,8 @@ import Me from './screens/Me'
 import EntryForm from './screens/EntryForm'
 import { AdventureDetail, DreamDetail, MemoryDetail, MilestoneDetail, PlaceDetail } from './screens/details'
 import Welcome from './screens/Welcome'
+import Guide from './screens/Guide'
+import { Tour } from './ui/Tour'
 import { isDemoMode } from './db/db'
 import { exitDemo } from './db/demo'
 import { usePrefs } from './lib/prefs'
@@ -32,6 +34,7 @@ function Shell() {
   const showTabs = onPrimary
   const showFab = onPrimary && loc.pathname !== '/map' // the map has its own + button
   const demo = isDemoMode()
+  const { toured } = usePrefs()
 
   return (
     <>
@@ -52,6 +55,7 @@ function Shell() {
           <Route path="/dreams" element={<Dreams />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/me" element={<Me />} />
+          <Route path="/guide" element={<Guide />} />
           <Route path="/new/:type" element={<EntryForm />} />
           <Route path="/edit/:type/:id" element={<EntryForm />} />
           <Route path="/place/:id" element={<PlaceDetail />} />
@@ -82,6 +86,8 @@ function Shell() {
           </nav>
         </>
       )}
+
+      {!toured && loc.pathname === '/' && <Tour />}
 
       <Sheet open={adding} onClose={() => setAdding(false)} label="Add to your atlas">
         <TypePicker

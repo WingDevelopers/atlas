@@ -156,3 +156,10 @@ export const IconText = (p: P) => (
     <path d="M5 6.5V5h14v1.5M12 5v14M9.5 19h5" />
   </svg>
 )
+export const IconHelp = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.7" />
+    <circle cx="12" cy="16.9" r=".6" fill="currentColor" />
+  </svg>
+)

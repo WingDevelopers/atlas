@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { coverOf, nextDream, stats, timeline, useAll } from '../lib/queries'
 import { Art } from '../ui/Art'
 import { Cover, EmptyState, Loading, Photo } from '../ui/primitives'
-import { IconCompassMark, IconDreams, IconPlus } from '../ui/icons'
+import { IconCompassMark, IconDreams, IconHelp, IconPlus } from '../ui/icons'
 import { fmtRange, greeting, postmark } from '../lib/format'
 import { usePrefs } from '../lib/prefs'
 
@@ -26,6 +26,9 @@ export default function Home({ onAdd }: { onAdd: () => void }) {
           <IconCompassMark />
           <span>ATLAS<span className="dot">.</span></span>
         </span>
+        <Link to="/guide" className="icon-btn help-link" aria-label="How ATLAS works">
+          <IconHelp />
+        </Link>
       </header>
 
       {latest ? (
