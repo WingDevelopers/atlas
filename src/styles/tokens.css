@@ -1,0 +1,99 @@
+/* ==========================================================================
+   MODERN WANDERLUST — design tokens
+   80% clean travel editorial · 20% sun-faded postcard
+   ========================================================================== */
+
+:root {
+  /* Brand palette (locked) */
+  --ivory: #f5f0e6;      /* primary background */
+  --sunshine: #e7b75f;   /* warm highlight */
+  --coral: #d77c66;      /* primary accent */
+  --sea-glass: #78aeb0;  /* secondary accent */
+  --charcoal: #414d45;   /* primary text */
+
+  /* Supporting tones, used sparingly */
+  --sand: #e9dfcc;
+  --sand-soft: #efe7d8;
+  --sage: #b7c2a9;
+  --paper: #fbf8f2;      /* card surface, a touch lighter than ivory */
+
+  /* Accessible derivatives (pass WCAG AA on ivory/paper) */
+  --coral-ink: #b0533c;  /* coral for text & links */
+  --coral-deep: #b85c45; /* primary button fill — white text passes AA */
+  --sea-ink: #356c6e;
+  --text: var(--charcoal);
+  --text-muted: #5c665f;
+  --line: rgba(65, 77, 69, 0.12);
+  --line-strong: rgba(65, 77, 69, 0.22);
+
+  /* Tints */
+  --coral-tint: #f3dcd3;
+  --sea-tint: #d9e9e8;
+  --sun-tint: #f6e7c6;
+  --sage-tint: #e3e8db;
+
+  /* Typography */
+  --font-ui: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --fs-3xl: 2.25rem;
+  --fs-hero: clamp(2.1rem, 8vw, 3.2rem);
+
+  /* Space (4pt grid) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+  --s12: 48px;
+
+  /* Shape */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Soft, warm shadows */
+  --shadow-sm: 0 1px 2px rgba(65, 50, 30, 0.06), 0 2px 8px rgba(65, 50, 30, 0.05);
+  --shadow-md: 0 2px 6px rgba(65, 50, 30, 0.06), 0 10px 28px rgba(65, 50, 30, 0.09);
+  --shadow-lg: 0 8px 40px rgba(65, 50, 30, 0.16);
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.8, 0.26, 1);
+  --t-fast: 140ms;
+  --t-med: 260ms;
+
+  /* Layout */
+  --tabbar-h: 64px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --col: 680px;
+
+  --tap: 44px; /* minimum tap target */
+}
+
+/* User preference: larger text */
+:root[data-text='large'] {
+  font-size: 112.5%;
+}
+
+/* Reduced motion: system setting or in-app preference */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-med: 0ms;
+  }
+}
+:root[data-motion='reduce'] {
+  --t-fast: 0ms;
+  --t-med: 0ms;
+}
