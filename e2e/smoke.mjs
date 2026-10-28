@@ -223,6 +223,21 @@ if (await page.getByText('Got a plant').count()) throw new Error('“keep going�
 await shot('09d-chapters-list')
 await page.goto(BASE + '#/archive')
 step('milestones: keep going in a chapter, or open a new one (previous closes)')
+
+// Start a chapter by hand from the + menu
+await page.goto(BASE + '#/')
+await page.getByRole('button', { name: 'Add an entry' }).click()
+await page.getByRole('dialog', { name: 'Add to your atlas' }).getByRole('button', { name: /Chapter/ }).click()
+await page.getByRole('heading', { name: 'New chapter' }).waitFor()
+await page.locator('#title').fill('Learning to cook')
+await page.getByRole('button', { name: 'Add entries' }).click()
+await page.getByRole('dialog', { name: 'Add entries to chapter' }).getByText('Spring in Lisbon').click()
+await page.getByRole('button', { name: 'Done' }).click()
+await page.getByRole('button', { name: 'Save chapter' }).click()
+await page.getByRole('heading', { name: 'Learning to cook' }).waitFor()
+await page.goto(BASE + '#/archive?view=chapters')
+await page.getByRole('link', { name: 'New chapter' }).waitFor()
+step('chapters by hand: + → Chapter, and New chapter in Archive')
 await page.getByRole('link', { name: 'Map' }).last().click()
 // Zoomed out: countries are filled (Portugal visited, Japan wishlist), pins hidden
 const fills = page.locator('.map-page path.atlas-country')

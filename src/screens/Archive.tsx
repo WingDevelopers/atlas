@@ -51,7 +51,7 @@ export default function Archive() {
   return (
     <main className="page">
       <PageTitle title="Archive" subtitle="Not just where you’ve been. Who you’ve become." />
-      {total > 0 && (
+      {(total > 0 || data.chapters.length > 0) && (
         <div className="pad" style={{ marginBottom: 'var(--s4)' }}>
           <Segmented
             label="Archive view"

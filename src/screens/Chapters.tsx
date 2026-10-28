@@ -43,10 +43,10 @@ export function ChaptersList({ data }: { data: AllData }) {
 
   return (
     <div className="chapters">
-      <div className="pad row" style={{ marginBottom: 'var(--s4)' }}>
-        <p className="small muted spacer">Name the seasons of your life and gather what belongs to each.</p>
-        <Link to="/new/chapter" className="btn btn-sm btn-secondary">
-          <IconPlus /> Chapter
+      <div className="pad stack" style={{ marginBottom: 'var(--s5)', gap: 10 } as never}>
+        <p className="small muted">Name the seasons of your life and gather what belongs to each.</p>
+        <Link to="/new/chapter" className="btn btn-primary btn-block">
+          <IconPlus /> New chapter
         </Link>
       </div>
 

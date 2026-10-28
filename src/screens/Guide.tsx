@@ -437,7 +437,7 @@ export default function Guide() {
                   Use <b>Add entries</b> to include or remove anything, and ↑ ↓ (or <b>Sort by date</b>) to set the order.
                 </>,
                 <>
-                  Prefer to start from scratch? <b>+ Chapter</b> at the top of the list.
+                  Prefer to start from scratch? Tap the coral <b>+</b> → <b>Chapter</b>, or <b>New chapter</b> at the top of Archive → Chapters.
                 </>,
               ]}
             />
