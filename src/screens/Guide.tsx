@@ -196,7 +196,10 @@ export default function Guide() {
           </Fold>
           <Fold icon={<IconMap />} tint={T.sun} title="Map" sub="Every place with a pin">
             <p>
-              Coral pins are places you’ve <b>visited</b>; sea‑glass pins are on your <b>wishlist</b>. Nearby pins group into a numbered circle — tap it to zoom in.
+              Countries you’ve <b>visited</b> fill with coral; countries only on your <b>wishlist</b> fill with sea glass (visited wins if both). Tap a country to see your places there.
+            </p>
+            <p>
+              <b>Zoom in</b> to a region and each place appears as a pin, in the same colours. Nearby pins group into a numbered circle — tap it to zoom further.
             </p>
             <ul className="guide-list">
               <li>
@@ -206,13 +209,13 @@ export default function Guide() {
                 <b>All / Visited / Wishlist</b> filters the pins. Year and category filters appear once your places have dates or categories.
               </li>
               <li>
-                <b>Tap a pin</b> for a preview → <b>View memories</b> opens the full place page with everything that happened there.
+                <b>Tap a country</b> for the list of places there, or <b>Zoom in</b>. <b>Tap a pin</b> for a preview → <b>View memories</b> opens the full place page.
               </li>
               <li>
                 <b>Press and hold</b> anywhere on the map (right‑click on a computer) to add a place right there. The <b>+</b> next to search adds one too.
               </li>
             </ul>
-            <p className="xs muted">Places without a pin still exist — they just don’t show on the map until you add one.</p>
+            <p className="xs muted">A place colours its country from its pin — or, if it has no pin, from its Country field. Without either, it simply doesn’t appear on the map.</p>
           </Fold>
           <Fold icon={<IconDreams />} tint={T.sage} title="Dreams" sub="Things you haven’t done. Yet.">
             <p>
@@ -284,7 +287,7 @@ export default function Guide() {
               <dt>Fill in</dt>
               <dd>Name, Been there / Wishlist, and an optional pin. Search the world map, tap the map to drop a pin, or tap “Use my location”. More details: region, country, address, category, first‑visited date, notes, tags.</dd>
               <dt>Shows up</dt>
-              <dd>Map (if it has a pin), the Places total on Home, and linked from adventures, memories and dreams.</dd>
+              <dd>Map (its country fills with colour; its pin shows when you zoom in), the Places total on Home, and linked from adventures, memories and dreams.</dd>
               <dt>Its page shows</dt>
               <dd>Visit history (built from linked adventures and memories), every linked adventure, memory and dream, and “I’ve been here” for wishlist places.</dd>
             </dl>
@@ -344,7 +347,7 @@ export default function Guide() {
                 </>,
                 <>Or search: type a city, park or address and pick a result. Search needs internet and only sends the words you typed.</>,
                 <>
-                  Choose <b>Been there</b> or <b>Wishlist</b>. Save.
+                  Choose <b>Been there</b> or <b>Wishlist</b>. Save — its country fills with coral or sea glass.
                 </>,
                 <>
                   Already have a place without a pin? Open it → <b>Add a pin</b>.
@@ -367,7 +370,7 @@ export default function Guide() {
           </Fold>
           <Fold icon={<IconPin />} tint={T.sea} title="Move a wishlist place to visited">
             <p>
-              Open the place → <b>I’ve been here</b>. Its pin turns coral. Then add an adventure or memory linked to it so it gets a visit date.
+              Open the place → <b>I’ve been here</b>. Its pin — and its country — turn coral. Then add an adventure or memory linked to it so it gets a visit date.
             </p>
           </Fold>
           <Fold icon={<IconCamera />} tint={T.sand} title="Add photos and choose a cover">

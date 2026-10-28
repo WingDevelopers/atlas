@@ -35,11 +35,11 @@ export default defineConfig({
         navigateFallback: 'index.html',
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/[a-d]\.basemaps\.cartocdn\.com\/.*/,
+            urlPattern: /^https:\/\/(tile\.openstreetmap\.org|[a-d]\.basemaps\.cartocdn\.com)\/.*/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'atlas-map-tiles',
-              expiration: { maxEntries: 2000, maxAgeSeconds: 60 * 60 * 24 * 60 },
+              expiration: { maxEntries: 2000, maxAgeSeconds: 60 * 60 * 24 * 14 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },

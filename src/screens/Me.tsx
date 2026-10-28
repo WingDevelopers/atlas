@@ -8,6 +8,7 @@ import { wipeAll } from '../db/repo'
 import { bytes, fmtDate } from '../lib/format'
 import { setPrefs, usePrefs } from '../lib/prefs'
 import { stats, useAll } from '../lib/queries'
+import { countryFills, loadCountries } from '../map/countries'
 import { IconBook, IconCamera, IconCompassMark, IconDownload, IconHelp, IconShield, IconSparkle, IconText, IconTrash, IconUpload } from '../ui/icons'
 import { Loading, PageTitle, Segmented, Sheet, useConfirm, useToast } from '../ui/primitives'
 
@@ -51,6 +52,17 @@ export default function Me() {
   const [busy, setBusy] = useState('')
   const [storage, setStorage] = useState<{ usage?: number; quota?: number; persisted?: boolean }>({})
   const [mediaInfo, setMediaInfo] = useState<{ count: number; size: number; orphans: number }>()
+  const [visitedCountries, setVisitedCountries] = useState<number>()
+  useEffect(() => {
+    if (!data) return
+    let alive = true
+    loadCountries()
+      .then((cs) => alive && setVisitedCountries(countryFills(cs, data.places).filter((f) => f.status === 'visited').length))
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [data])
   const [restore, setRestore] = useState<{ file: File; manifest: BackupManifest } | null>(null)
   const [restoreErr, setRestoreErr] = useState('')
   const [last, setLast] = useState(() => {
@@ -164,7 +176,7 @@ export default function Me() {
       <div className="facts pad">
         {[
           ['Places visited', s.places],
-          ['Countries', s.countries],
+          ['Countries', visitedCountries ?? s.countries],
           ['Adventures', s.adventures],
           ['Memories', s.memories],
           ['Milestones', s.milestones],
@@ -179,7 +191,7 @@ export default function Me() {
         ))}
       </div>
       <p className="pad xs muted" style={{ marginTop: 8 }}>
-        Counted from your entries. Countries come from the “Country” field on visited places.
+        Counted from your entries. Countries come from each visited place’s pin (or its Country field) — the same coral countries you see on the map.
       </p>
 
       <Group title="Help">
@@ -303,7 +315,7 @@ export default function Me() {
               Everything you add is stored only in this browser on this device. There’s no account, no analytics and no tracking. Photos are never uploaded. Your location is only read if you tap “Use my location”.
             </span>
             <span style={{ display: 'block', marginTop: 8 }}>
-              Internet is used only for map tiles (CARTO / OpenStreetMap) and when you press Search on the world map (Photon / OpenStreetMap) — only the search words are sent.
+              Internet is used only for map backgrounds (CARTO, built on OpenStreetMap) and when you press Search on the world map (Photon / OpenStreetMap) — only the search words are sent.
             </span>
             <span style={{ display: 'block', marginTop: 8 }}>
               Because data lives on this device, regular backups are your safety net. On iPhone, add ATLAS to your Home Screen so Safari keeps your data.

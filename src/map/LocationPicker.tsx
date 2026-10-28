@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import { pinIcon, searchWorld, TILE_ATTRIBUTION, TILE_URL, type GeoResult } from './leaflet'
+import { pinIcon, searchWorld, TILE_OPTIONS, type GeoResult } from './leaflet'
 import { IconLocate, IconSearch } from '../ui/icons'
 
 export interface PickedLocation {
@@ -99,7 +99,7 @@ export function LocationPicker({ value, onChange }: { value: PickedLocation; onC
       )}
       <div className="picker-map">
         <MapContainer center={has ? [value.lat!, value.lng!] : [20, 0]} zoom={has ? 10 : 2} scrollWheelZoom worldCopyJump>
-          <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} subdomains="abcd" maxZoom={19} />
+          <TileLayer {...TILE_OPTIONS} />
           <ClickToPlace onPick={(lat, lng) => onChange({ ...value, lat, lng })} />
           <FlyTo lat={value.lat} lng={value.lng} />
           {has && <Marker position={[value.lat!, value.lng!]} icon={pinIcon('pick')} />}

@@ -4,8 +4,41 @@ import 'leaflet.markercluster/dist/MarkerCluster.css'
 
 export { L }
 
-export const TILE_URL = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-export const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+/**
+ * Map background tiles.
+ *
+ * CARTO "Voyager" (the light, editorial style) is used when a CARTO Basemaps
+ * key is set below. CARTO ended keyless access in autumn 2026; a free key for
+ * personal, non-commercial use comes from https://dashboard.basemaps.carto.com/.
+ * Map keys are public by nature (they travel in every tile address), so it is
+ * fine for this to live in the code — restrict the key to your site's address
+ * in the CARTO dashboard.
+ *
+ * Without a key, ATLAS falls back to OpenStreetMap's standard map (free, keyless,
+ * policy: https://operations.osmfoundation.org/policies/tiles/).
+ *
+ * Both require the browser to send a Referer, so index.html and the tile layers
+ * use referrer policy "strict-origin" (only the site's address is shared).
+ */
+export const CARTO_KEY: string = 'cb1_4x6d_1_30230531f014077f2bd5870e'
+
+const carto = CARTO_KEY.trim()
+export const TILE_URL = carto
+  ? `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(carto)}`
+  : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+export const TILE_ATTRIBUTION = carto
+  ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+export const TILE_MAX_ZOOM = 19
+/** Extra Leaflet tile-layer options for the active provider. */
+export const TILE_OPTIONS = {
+  url: TILE_URL,
+  attribution: TILE_ATTRIBUTION,
+  maxZoom: TILE_MAX_ZOOM,
+  referrerPolicy: 'strict-origin' as const,
+  ...(carto ? { subdomains: 'abcd' } : {}),
+}
+export const TILE_PROVIDER: 'carto' | 'osm' = carto ? 'carto' : 'osm'
 
 export function pinIcon(kind: 'visited' | 'wishlist' | 'pick', label?: string) {
   return L.divIcon({

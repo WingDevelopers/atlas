@@ -1610,7 +1610,7 @@ button.card:active {
 
 /* Sun-faded map tiles */
 .leaflet-tile-pane {
-  filter: sepia(0.22) saturate(0.85) brightness(1.02);
+  filter: sepia(0.3) saturate(0.72) brightness(1.03) contrast(0.96);
 }
 
 /* ==========================================================================
@@ -1925,4 +1925,51 @@ button.card:active {
 }
 .help-link {
   margin-left: auto;
+}
+
+/* Country fills */
+.country-places {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--s2) var(--s3);
+  max-height: 32vh;
+  overflow-y: auto;
+}
+.country-place {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  min-height: var(--tap);
+  border-radius: 12px;
+  color: inherit;
+  font-weight: 560;
+}
+.country-place:hover {
+  background: var(--sand-soft);
+}
+.country-place .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--coral);
+  flex: none;
+}
+.country-place .dot.wishlist {
+  background: var(--sea-glass);
+}
+.atlas-tip {
+  background: var(--charcoal);
+  color: var(--ivory);
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font: 600 12px var(--font-ui);
+  box-shadow: var(--shadow-sm);
+}
+.atlas-tip::before {
+  display: none;
+}
+.leaflet-interactive:focus {
+  outline: none;
 }
