@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { addToChapter, chapterOn, completeDream, createEntry, getEntry, openChapterAt, todayIso, updateEntry, ValidationError } from '../db/repo'
 import { addPhotos, removePhoto } from '../db/media'
 import { DREAM_STATUSES, DREAM_TYPES, ENTRY_LABEL, PLACE_CATEGORIES, type Chapter, type EntryMap, type EntryType, type Milestone } from '../db/types'
-import { BackBar, Loading, Photo, Segmented, Sheet, useToast } from '../ui/primitives'
+import { BackBar, Loading, Photo, Segmented, Sheet, useConfirm, useToast } from '../ui/primitives'
 import { IconCamera, IconClose, IconHeart } from '../ui/icons'
 import { LocationPicker } from '../map/LocationPicker'
 import { type GeoResult } from '../map/leaflet'
@@ -104,6 +104,7 @@ export default function EntryForm() {
   const [search] = useSearchParams()
   const nav = useNavigate()
   const toast = useToast()
+  const confirm = useConfirm()
   const all = useAll()
   const type = params.type as EntryType
   const editId = params.id
@@ -217,6 +218,16 @@ export default function EntryForm() {
         if (!hasLoc) {
           data.lat = undefined
           data.lng = undefined
+          // Without a location ATLAS can't colour it on the map — make that a choice, not an accident.
+          const ok = await confirm({
+            title: 'Save without a location?',
+            text: 'It won’t be coloured on your map until it has one. Search for it under Location (or tap the map) to place it — or save now and add it later.',
+            confirmLabel: 'Save anyway',
+          })
+          if (!ok) {
+            setMore(true)
+            return
+          }
         }
       }
 

@@ -163,3 +163,11 @@ export const IconHelp = (p: P) => (
     <circle cx="12" cy="16.9" r=".6" fill="currentColor" />
   </svg>
 )
+export const IconList = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M9 6.5h11M9 12h11M9 17.5h11" />
+    <circle cx="4.5" cy="6.5" r="1.2" fill="currentColor" />
+    <circle cx="4.5" cy="12" r="1.2" fill="currentColor" />
+    <circle cx="4.5" cy="17.5" r="1.2" fill="currentColor" />
+  </svg>
+)

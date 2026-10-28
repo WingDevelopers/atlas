@@ -15,6 +15,7 @@ export function PlaceSearch({
   placeholder = 'Type a city, country or landmark…',
   label = 'Search for a place',
   autoFocus,
+  initialQuery = '',
 }: {
   places: Place[]
   exclude?: string[]
@@ -23,11 +24,13 @@ export function PlaceSearch({
   placeholder?: string
   label?: string
   autoFocus?: boolean
+  /** Start with this text already searched (e.g. the place's name). */
+  initialQuery?: string
 }) {
-  const [q, setQ] = useState('')
+  const [q, setQ] = useState(initialQuery)
   const [results, setResults] = useState<GeoResult[]>([])
   const [state, setState] = useState<'idle' | 'loading' | 'offline'>('idle')
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(!!initialQuery)
   const seq = useRef(0)
   const listId = useId()
 

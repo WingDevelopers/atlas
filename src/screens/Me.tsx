@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { backupFileName, exportBackup, importBackup, readBackup, type BackupManifest, type ImportMode } from '../db/backup'
 import { getDb, isDemoMode } from '../db/db'
 import { enterDemo, exitDemo, removeDemoData } from '../db/demo'
@@ -182,12 +182,21 @@ export default function Me() {
           ['Milestones', s.milestones],
           ['Dreams done', `${s.dreamsDone} of ${s.dreamsDone + s.dreams}`],
         ].map(([k, v]) => (
-          <div className="fact" key={k as string}>
-            <div className="eyebrow">{k}</div>
-            <div className="display" style={{ fontSize: 'var(--fs-xl)' }}>
-              {v}
+          k === 'Places visited' || k === 'Countries' ? (
+            <Link to="/places" className="fact" key={k as string} style={{ color: 'inherit' }}>
+              <div className="eyebrow">{k} ›</div>
+              <div className="display" style={{ fontSize: 'var(--fs-xl)' }}>
+                {v}
+              </div>
+            </Link>
+          ) : (
+            <div className="fact" key={k as string}>
+              <div className="eyebrow">{k}</div>
+              <div className="display" style={{ fontSize: 'var(--fs-xl)' }}>
+                {v}
+              </div>
             </div>
-          </div>
+          )
         ))}
       </div>
       <p className="pad xs muted" style={{ marginTop: 8 }}>

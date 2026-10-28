@@ -2209,3 +2209,134 @@ button.card:active {
   font-size: 18px;
   line-height: 1;
 }
+
+.link-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--coral-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Places list: continent › country › city */
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+  padding: var(--s6) var(--s5) var(--s12);
+}
+.tree-continent-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+}
+.tree-continent-h .display {
+  font-size: var(--fs-2xl);
+}
+.tree-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--coral);
+  flex: none;
+}
+.tree-dot.wishlist {
+  background: var(--sea-glass);
+}
+.tree-country summary {
+  min-height: 56px;
+}
+.tree-cities {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--s4) var(--s4) calc(var(--s4) + 30px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tree-city-link,
+.tree-city {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  color: inherit;
+  min-height: var(--tap);
+  justify-content: center;
+}
+.tree-city {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 2px;
+}
+.tree-city-link b,
+.tree-city b {
+  font-weight: 620;
+}
+.tree-places {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0 0 0 12px;
+  border-left: 2px solid var(--line);
+}
+.tree-places a {
+  display: block;
+  padding: 7px 0;
+  color: var(--text);
+  min-height: 36px;
+}
+.locate-list {
+  list-style: none;
+  margin: var(--s4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.locate-list li {
+  padding: var(--s3);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+.locate-list .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--coral);
+  flex: none;
+}
+.locate-list .dot.wishlist {
+  background: var(--sea-glass);
+}
+.map-fix {
+  position: absolute;
+  z-index: 500;
+  left: 50%;
+  bottom: var(--s4);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  max-width: calc(100% - 32px);
+  background: rgba(251, 248, 242, 0.96);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+.dot-warn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sunshine);
+  color: var(--charcoal);
+  font-weight: 800;
+  font-size: 12px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}

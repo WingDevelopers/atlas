@@ -459,6 +459,39 @@ export function DreamDetail() {
         </section>
       )}
       <Facts items={[['Budget', d.budget], ['With', d.companions], ['Place', place && <Link to={`/place/${place.id}`}>{place.name}</Link>]]} />
+      {!done && (
+        <section>
+          <h2>On your map</h2>
+          {!place ? (
+            <div className="note">
+              No place yet.{' '}
+              <Link to={`/edit/dream/${d.id}`}>Add where</Link> and it appears on your map in sea glass.
+            </div>
+          ) : place.lat === undefined && !place.country ? (
+            <div className="note warn">
+              {place.name} has no location yet, so it can’t be shown. <Link to={`/edit/place/${place.id}`}>Add its location</Link>.
+            </div>
+          ) : place.status === 'wishlist' ? (
+            <div className="row" style={{ gap: 10 }}>
+              <span className="place-chip wishlist" style={{ paddingRight: 14 }}>
+                <span className="dot wishlist" aria-hidden />
+                {place.name}
+              </span>
+              <Link to={`/map?focus=${place.id}`} className="btn btn-sm btn-secondary">
+                Show on map
+              </Link>
+            </div>
+          ) : (
+            <div className="note">
+              You’ve already been to {place.name}, so it shows in <b>coral</b> (visited) — dreaming of going back counts too. If you haven’t actually been,{' '}
+              <button className="link-btn" onClick={() => updateEntry('place', place.id, { status: 'wishlist', visitedOn: undefined })}>
+                mark {place.name} as not visited yet
+              </button>{' '}
+              and it turns sea glass.
+            </div>
+          )}
+        </section>
+      )}
       {d.notes && (
         <section>
           <h2>Notes & planning</h2>

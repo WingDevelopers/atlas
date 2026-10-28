@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { L, pinIcon, TILE_OPTIONS } from '../map/leaflet'
-import { countryFills, loadCountries, type Country, type CountryFill } from '../map/countries'
+import { countryByName, countryFills, loadCountries, type Country, type CountryFill } from '../map/countries'
+import { isUnlocated, LocatePlacesSheet } from '../map/LocatePlaces'
 import { ensureAreas, needsArea } from '../map/areas'
 import { coverOf, placeYears, useAll, visitsFor } from '../lib/queries'
 import type { Place } from '../db/types'
 import { Cover, Loading, Segmented } from '../ui/primitives'
-import { IconClose, IconPlus, IconSearch } from '../ui/icons'
+import { IconClose, IconList, IconPlus, IconSearch } from '../ui/icons'
 import { cap, fmtDate, placeLine } from '../lib/format'
 
 type StatusFilter = 'all' | 'visited' | 'wishlist'
@@ -49,6 +50,35 @@ function CountryLayer({ fills, onSelect, selectedId, always }: { fills: CountryF
     }
     return () => layers.forEach((l) => map.removeLayer(l))
   }, [map, fills, onSelect, selectedId, close])
+  return null
+}
+
+/**
+ * Zoomed out, a wishlist place inside a country you've already visited would be
+ * hidden under the coral. Show it as a sea-glass dot so dreams stay visible.
+ */
+function WishlistDots({ fills, onSelect }: { fills: CountryFill[]; onSelect: (p: Place) => void }) {
+  const map = useMap()
+  const close = useZoom() >= PIN_ZOOM
+  useEffect(() => {
+    if (close) return
+    const layers: L.Layer[] = []
+    for (const f of fills) {
+      if (f.status !== 'visited') continue
+      for (const p of f.places) {
+        if (p.status !== 'wishlist' || typeof p.lat !== 'number' || typeof p.lng !== 'number') continue
+        const dot = L.circleMarker([p.lat, p.lng], { radius: 6, color: '#fffdf8', weight: 2, fillColor: '#78AEB0', fillOpacity: 1, className: 'atlas-dot wishlist' })
+        dot.on('click', (e) => {
+          L.DomEvent.stopPropagation(e)
+          onSelect(p)
+        })
+        dot.bindTooltip(`${p.name} · wishlist`, { direction: 'top', className: 'atlas-tip' })
+        dot.addTo(map)
+        layers.push(dot)
+      }
+    }
+    return () => layers.forEach((l) => map.removeLayer(l))
+  }, [map, fills, onSelect, close])
   return null
 }
 
@@ -186,6 +216,7 @@ export default function MapScreen() {
   const [selCountry, setSelCountry] = useState<CountryFill | undefined>()
   const [zoomTarget, setZoomTarget] = useState<CountryFill | undefined>()
   const [countries, setCountries] = useState<Country[] | null>(null)
+  const [fixing, setFixing] = useState(false)
   const focusId = params.get('focus')
 
   useEffect(() => {
@@ -244,6 +275,7 @@ export default function MapScreen() {
 
   if (!data) return <Loading />
   const unlocated = data.places.length - located.length
+  const lost = countries ? data.places.filter((p) => isUnlocated(p, (n) => !!countryByName(countries, n))) : []
 
   return (
     <main className="map-page">
@@ -252,6 +284,7 @@ export default function MapScreen() {
         <TileLayer {...TILE_OPTIONS} />
         <CountryLayer fills={fills} onSelect={selectCountry} selectedId={selCountry?.country.id} />
         <PlaceAreas places={visible} onSelect={setSelected} selectedId={selected?.id} />
+        <WishlistDots fills={fills} onSelect={setSelected} />
         {countries && countries.length === 0 && <ClusterLayer places={visible} onSelect={setSelected} />}
         <ZoomToCountry target={zoomTarget} />
         <FitTo places={visible} focus={focus} />
@@ -267,6 +300,9 @@ export default function MapScreen() {
               <IconClose />
             </button>
           )}
+          <Link to="/places" className="icon-btn" style={{ width: 40, height: 40 }} aria-label="See your places as a list">
+            <IconList />
+          </Link>
           <button className="icon-btn" style={{ background: "var(--coral-deep)", color: "#fff", width: 40, height: 40 }} onClick={() => nav("/new/place")} aria-label="Add place">
             <IconPlus />
           </button>
@@ -289,7 +325,7 @@ export default function MapScreen() {
                 <div className="xs muted">
                   {cap(p.status === 'visited' ? 'visited' : 'wishlist')}
                   {placeLine(p) && ` · ${placeLine(p)}`}
-                  {p.lat === undefined && ' · no pin yet'}
+                  {p.lat === undefined && ' · not on the map yet'}
                 </div>
               </button>
             ))}
@@ -329,11 +365,18 @@ export default function MapScreen() {
           <b>Your map is waiting.</b>
           <p className="small muted" style={{ marginTop: 4 }}>
             Add a place — somewhere you’ve been, or somewhere you dream of — and its country fills with colour.
-            {unlocated > 0 && ` (${unlocated} of your places don’t have a pin yet.)`}
+            {unlocated > 0 && ` (${unlocated} of your places don’t have a location yet.)`}
           </p>
-          <Link to="/new/place" className="btn btn-primary btn-sm" style={{ marginTop: 12 }}>
-            <IconPlus /> Add place
-          </Link>
+          <div className="row" style={{ marginTop: 12 }}>
+            <Link to="/new/place" className="btn btn-primary btn-sm">
+              <IconPlus /> Add place
+            </Link>
+            {lost.length > 0 && (
+              <button className="btn btn-secondary btn-sm" onClick={() => setFixing(true)}>
+                Put {lost.length === 1 ? 'it' : 'them'} on the map
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -395,6 +438,16 @@ export default function MapScreen() {
           </div>
         </div>
       )}
+
+      {lost.length > 0 && !selected && !selCountry && (located.length > 0 || fills.length > 0) && (
+        <button className="btn btn-sm map-fix" onClick={() => setFixing(true)}>
+          <span className="dot-warn" aria-hidden>
+            !
+          </span>
+          {lost.length === 1 ? `“${lost[0].name}” isn’t on the map yet` : `${lost.length} places aren’t on the map yet`} — fix
+        </button>
+      )}
+      <LocatePlacesSheet places={lost} open={fixing} onClose={() => setFixing(false)} />
 
       {selected && (
         <div className="place-preview" role="dialog" aria-label={selected.name}>

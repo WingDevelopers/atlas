@@ -4,6 +4,7 @@ import { getDb } from '../db/db'
 import { Art, EmptyArt } from './Art'
 import { IconBack } from './icons'
 import { useNavigate } from 'react-router-dom'
+import { createPortal } from 'react-dom'
 
 /* ---------------- Photos ---------------- */
 
@@ -116,14 +117,16 @@ export function Sheet({ open, onClose, children, label }: { open: boolean; onClo
     }
   }, [open, onClose])
   if (!open) return null
-  return (
+  // Rendered at the top level of the page so it always sits above the map and tab bar.
+  return createPortal(
     <>
       <div className="backdrop" onClick={onClose} />
       <div className="sheet" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} ref={ref}>
         <div className="grabber" />
         {children}
       </div>
-    </>
+    </>,
+    document.body,
   )
 }
 

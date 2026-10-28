@@ -60,7 +60,7 @@ export default function Home({ onAdd }: { onAdd: () => void }) {
       )}
 
       <div className="stats" aria-label="Your totals">
-        <Link to="/map" className="stat" style={{ color: 'inherit' }}>
+        <Link to="/places" className="stat" style={{ color: 'inherit' }}>
           <b>{s.places}</b>
           <span>{s.places === 1 ? 'Place' : 'Places'}</span>
         </Link>

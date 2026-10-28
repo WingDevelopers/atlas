@@ -12,6 +12,7 @@ import EntryForm from './screens/EntryForm'
 import { AdventureDetail, DreamDetail, MemoryDetail, MilestoneDetail, PlaceDetail } from './screens/details'
 import Welcome from './screens/Welcome'
 import Guide from './screens/Guide'
+import PlacesList from './screens/PlacesList'
 import { ChapterDetail, ChapterForm } from './screens/Chapters'
 import { Tour } from './ui/Tour'
 import { isDemoMode } from './db/db'
@@ -57,6 +58,7 @@ function Shell() {
           <Route path="/archive" element={<Archive />} />
           <Route path="/me" element={<Me />} />
           <Route path="/guide" element={<Guide />} />
+          <Route path="/places" element={<PlacesList />} />
           <Route path="/chapter/:id" element={<ChapterDetail />} />
           <Route path="/new/chapter" element={<ChapterForm />} />
           <Route path="/edit/chapter/:id" element={<ChapterForm />} />
