@@ -1,5 +1,5 @@
 /**
- * The Atlas data model.
+ * ATLAS data model.
  *
  * Every record has a stable string id plus createdAt/updatedAt (ISO strings).
  * Relationships are explicit id references — a Place is never an Adventure,

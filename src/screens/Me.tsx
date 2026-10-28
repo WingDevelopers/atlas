@@ -290,7 +290,7 @@ export default function Me() {
               Internet is used only for map tiles (CARTO / OpenStreetMap) and when you press Search on the world map (Photon / OpenStreetMap) — only the search words are sent.
             </span>
             <span style={{ display: 'block', marginTop: 8 }}>
-              Because data lives on this device, regular backups are your safety net. On iPhone, add The Atlas to your Home Screen so Safari keeps your data.
+              Because data lives on this device, regular backups are your safety net. On iPhone, add ATLAS to your Home Screen so Safari keeps your data.
             </span>
           </span>
         </div>
@@ -333,7 +333,7 @@ export default function Me() {
       </Group>
 
       <p className="pad xs muted" style={{ marginTop: 'var(--s8)', textAlign: 'center' }}>
-        The Atlas · v0.1 · A living map of your life.
+        ATLAS · v0.1 · A living map of your life.
       </p>
 
       <Sheet open={!!restore} onClose={() => setRestore(null)} label="Restore backup">

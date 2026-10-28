@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// The Atlas is a static, offline-first web app.
+// ATLAS is a static, offline-first web app.
 // `base: './'` lets the built app run from any folder or static host.
 export default defineConfig({
   base: './',
@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'The Atlas',
-        short_name: 'atlas.',
+        name: 'ATLAS',
+        short_name: 'ATLAS.',
         description: 'A living map of your life.',
         theme_color: '#F5F0E6',
         background_color: '#F5F0E6',

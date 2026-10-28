@@ -14,7 +14,7 @@ import type { Adventure, Chapter, Dream, Media, Memory, Milestone, Place } from 
  *   README.txt               this explanation in plain words
  *
  * Everything is plain JSON + ordinary image files, so it can be opened
- * without The Atlas.
+ * without ATLAS.
  */
 
 export const BACKUP_FORMAT = 'the-atlas-backup'
@@ -62,19 +62,19 @@ async function sha256(bytes: ArrayBuffer | Uint8Array): Promise<string> {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-const README = `THE ATLAS — BACKUP
+const README = `ATLAS — BACKUP
 A living map of your life.
 
-This file is a complete copy of your Atlas: every place, adventure,
+This file is a complete copy of your ATLAS: every place, adventure,
 memory, milestone, dream and chapter, plus every photo in its original form.
 
-To restore: open The Atlas → Me → Backup → Restore from backup.
+To restore: open ATLAS → Me → Backup → Restore from backup.
 
 What's inside
 - data.json: all your entries as plain JSON text.
 - media/originals: your photos exactly as you added them.
 - media/thumbs: smaller preview copies.
-- manifest.json: a checksum (SHA-256) for every file, so The Atlas can
+- manifest.json: a checksum (SHA-256) for every file, so ATLAS can
   confirm nothing was damaged before restoring.
 
 Keep this file somewhere safe — a second drive or a private cloud folder.
@@ -142,19 +142,19 @@ export async function readBackup(file: Blob): Promise<CheckedBackup> {
   try {
     zip = await JSZip.loadAsync(await file.arrayBuffer())
   } catch {
-    throw new BackupError("This doesn't look like an Atlas backup (it isn't a readable .zip file).")
+    throw new BackupError("This doesn't look like an ATLAS backup (it isn't a readable .zip file).")
   }
   const mf = zip.file('manifest.json')
-  if (!mf) throw new BackupError('This zip has no manifest.json, so it is not an Atlas backup.')
+  if (!mf) throw new BackupError('This zip has no manifest.json, so it is not an ATLAS backup.')
   let manifest: BackupManifest
   try {
     manifest = JSON.parse(await mf.async('string'))
   } catch {
     throw new BackupError('The backup manifest is damaged.')
   }
-  if (manifest.format !== BACKUP_FORMAT) throw new BackupError('This zip is not an Atlas backup.')
+  if (manifest.format !== BACKUP_FORMAT) throw new BackupError('This zip is not an ATLAS backup.')
   if (manifest.formatVersion > BACKUP_FORMAT_VERSION)
-    throw new BackupError('This backup was made by a newer version of The Atlas. Please update the app first.')
+    throw new BackupError('This backup was made by a newer version of ATLAS. Please update the app first.')
 
   for (const [path, hash] of Object.entries(manifest.files)) {
     const f = zip.file(path)

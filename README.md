@@ -1,4 +1,4 @@
-# The Atlas — *a living map of your life.*
+# ATLAS — *a living map of your life.*
 
 A private, offline-first personal adventure journal: places, adventures, memories,
 milestones and dreams, on a real map — stored only on your own device.
@@ -15,7 +15,7 @@ milestones and dreams, on a real map — stored only on your own device.
   no server, no analytics. Photos are never uploaded.
 - **Your safety net:** *Me → Export a backup* makes one `.zip` with every entry and every
   original photo. *Me → Restore from a backup* brings it all back (it checks the file first).
-- **iPhone tip:** add The Atlas to your Home Screen (Share → *Add to Home Screen*). Safari can
+- **iPhone tip:** add ATLAS to your Home Screen (Share → *Add to Home Screen*). Safari can
   clear website data that hasn't been opened for a few weeks; Home Screen apps are kept.
 
 ## Run it on your computer

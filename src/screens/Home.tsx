@@ -22,9 +22,9 @@ export default function Home({ onAdd }: { onAdd: () => void }) {
   return (
     <main className="page">
       <header className="topbar">
-        <span className="wordmark" aria-label="atlas.">
+        <span className="wordmark" aria-label="ATLAS.">
           <IconCompassMark />
-          <span>atlas<span className="dot">.</span></span>
+          <span>ATLAS<span className="dot">.</span></span>
         </span>
       </header>
 

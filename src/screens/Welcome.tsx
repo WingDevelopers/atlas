@@ -15,7 +15,7 @@ export default function Welcome() {
         <div className="hero-content" style={{ position: 'relative' }}>
           <div className="wordmark" style={{ color: '#fff', marginBottom: 'var(--s4)' }}>
             <IconCompassMark style={{ width: 28, height: 28 }} />
-            <span>atlas<span className="dot" style={{ color: "var(--sunshine)" }}>.</span></span>
+            <span>ATLAS<span className="dot" style={{ color: "var(--sunshine)" }}>.</span></span>
           </div>
           <h2>A living map of your life.</h2>
           <p>Places, adventures, memories and dreams — kept privately, on this device.</p>
