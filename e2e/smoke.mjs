@@ -65,6 +65,22 @@ if (await page.getByText('Welcome to ATLAS').count()) throw new Error('tour shou
 await shot('02-home-empty')
 step('onboarding + quick tour + guide + empty home')
 
+// A chapter can be created (and seen) before there are any entries
+await page.getByRole('button', { name: 'Add an entry' }).click()
+await page.getByRole('dialog', { name: 'Add to your atlas' }).getByRole('button', { name: /Chapter/ }).click()
+await page.locator('#title').fill('Before everything')
+await page.getByRole('button', { name: 'Save chapter' }).click()
+await page.getByRole('heading', { name: 'Before everything' }).waitFor()
+await page.getByText('Nothing here yet.').waitFor()
+await page.goto(BASE + '#/archive')
+await page.getByRole('button', { name: /^Chapters/ }).click()
+await page.getByRole('link', { name: /Before everything/ }).waitFor()
+await page.getByRole('link', { name: /Before everything/ }).click()
+await page.getByRole('button', { name: 'Delete chapter' }).click()
+await page.getByRole('button', { name: 'Delete chapter' }).last().click()
+await page.goto(BASE + '#/')
+step('empty chapter shows in Archive → Chapters with no entries yet')
+
 // Quick capture: memory with only a title
 await page.getByRole('button', { name: 'Add an entry' }).click()
 await page.getByRole('dialog', { name: 'Add to your atlas' }).getByRole('button', { name: /Memory/ }).click()

@@ -64,7 +64,9 @@ export default function Archive() {
           />
         </div>
       )}
-      {total === 0 ? (
+      {view === 'chapters' && (total > 0 || data.chapters.length > 0) ? (
+        <ChaptersList data={data} />
+      ) : total === 0 ? (
         <EmptyState
           title="Every story starts somewhere."
           text="Add your first memory. Your timeline will grow from there — year by year."
@@ -74,8 +76,6 @@ export default function Archive() {
             </Link>
           }
         />
-      ) : view === 'chapters' ? (
-        <ChaptersList data={data} />
       ) : (
         <>
           <div className="pad" style={{ marginBottom: 'var(--s3)' }}>
