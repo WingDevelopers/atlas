@@ -5,6 +5,9 @@ import { Cover, EmptyState, Loading, Photo } from '../ui/primitives'
 import { IconCompassMark, IconDreams, IconHelp, IconPlus } from '../ui/icons'
 import { fmtRange, greeting, postmark } from '../lib/format'
 import { usePrefs } from '../lib/prefs'
+import { currentTrip, upcomingTrip } from '../lib/trips'
+import { todayIso } from '../db/repo'
+import { CurrentTrip, UpcomingTrip } from './CurrentTrip'
 
 export default function Home({ onAdd }: { onAdd: () => void }) {
   const data = useAll()
@@ -18,6 +21,9 @@ export default function Home({ onAdd }: { onAdd: () => void }) {
   const heroPhoto = latest && coverOf(latest)
   const postcards = tl.filter((e) => e.kind !== 'milestone').slice(0, 12)
   const dream = nextDream(data.dreams)
+  const today = todayIso()
+  const trip = currentTrip(data.adventures, today)
+  const soon = trip ? undefined : upcomingTrip(data.adventures, today)
 
   return (
     <main className="page">
@@ -31,7 +37,9 @@ export default function Home({ onAdd }: { onAdd: () => void }) {
         </Link>
       </header>
 
-      {latest ? (
+      {trip ? (
+        <CurrentTrip trip={trip} data={data} />
+      ) : latest ? (
         <Link to={`/adventure/${latest.id}`} className={`hero grain${heroPhoto ? '' : ' art'}`} aria-label={`Latest adventure: ${latest.title}`}>
           {heroPhoto ? <Photo id={heroPhoto} variant="full" /> : <Art seed={latest.id} />}
           <div className="hero-content" style={{ position: 'relative' }}>
@@ -58,6 +66,8 @@ export default function Home({ onAdd }: { onAdd: () => void }) {
           </div>
         </section>
       )}
+
+      {soon && <UpcomingTrip trip={soon} />}
 
       <div className="stats" aria-label="Your totals">
         <Link to="/places" className="stat" style={{ color: 'inherit' }}>

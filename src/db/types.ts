@@ -85,6 +85,8 @@ export interface Adventure extends BaseRecord, WithPhotos {
   highlight: string
   /** Set when this adventure was created by completing a dream. */
   fromDreamId?: string
+  /** When “I’m home” was tapped — the trip is over even though it ends today. */
+  homeAt?: Timestamp
 }
 
 export interface Memory extends BaseRecord, WithPhotos {

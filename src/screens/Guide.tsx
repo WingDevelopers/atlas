@@ -366,7 +366,7 @@ export default function Guide() {
           <Fold icon={<IconCalendar />} tint={T.coral} title="A trip right now vs. places from before ATLAS">
             <p>ATLAS tells them apart by <b>dates</b> — everything lands in the right spot of your timeline and chapters.</p>
             <p>
-              <b>On a trip today:</b> + → <b>Adventure</b>, start date today (leave the end empty), add the places as you go. Add <b>memories</b> to it day by day from the adventure’s page. When you’re home, edit it and set the end date.
+              <b>On a trip today:</b> + → <b>Adventure</b>, start date today (leave the end empty). While it’s happening, <b>Home shows it at the top</b> (“Day 3”) with quick buttons: <b>Add a moment</b> (a memory linked to the trip), <b>Add photos</b>, <b>Current stop</b> (where you are right now — set it each time you move on) and <b>I’m home</b> (ends it today). An adventure starting soon shows a countdown on Home.
             </p>
             <p>
               <b>Countries and cities from before:</b> + → <b>Place</b> → <b>Been there</b>, search it, and under More details set <b>First visited</b> to roughly when (the 1st of the month or year is fine). It colours the map right away.
