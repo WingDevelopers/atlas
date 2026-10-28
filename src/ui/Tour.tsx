@@ -39,7 +39,7 @@ const STEPS: Step[] = [
     target: '/archive',
     icon: <IconArchive />,
     title: 'Archive',
-    text: 'Your adventures, memories and milestones as a timeline, year by year, with search and filters.',
+    text: 'Your adventures, memories and milestones as a timeline, year by year — or grouped into chapters you name, like “The Lisbon Years”.',
   },
   {
     target: '/me',

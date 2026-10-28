@@ -1,7 +1,8 @@
 import { Fragment, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { coverOf, timeline, useAll, type TimelineEntry } from '../lib/queries'
-import { Cover, EmptyState, FilterChips, Loading, PageTitle } from '../ui/primitives'
+import { Cover, EmptyState, FilterChips, Loading, PageTitle, Segmented } from '../ui/primitives'
+import { ChaptersList } from './Chapters'
 import { IconHeart, IconPlus, IconSearch } from '../ui/icons'
 import { fmtDate, fmtRange } from '../lib/format'
 
@@ -21,6 +22,8 @@ export default function Archive() {
   const data = useAll()
   const [f, setF] = useState<F>('all')
   const [q, setQ] = useState('')
+  const [params, setParams] = useSearchParams()
+  const view = params.get('view') === 'chapters' ? 'chapters' : 'timeline'
 
   const groups = useMemo(() => {
     if (!data) return []
@@ -48,6 +51,19 @@ export default function Archive() {
   return (
     <main className="page">
       <PageTitle title="Archive" subtitle="Not just where you’ve been. Who you’ve become." />
+      {total > 0 && (
+        <div className="pad" style={{ marginBottom: 'var(--s4)' }}>
+          <Segmented
+            label="Archive view"
+            value={view}
+            onChange={(v) => setParams(v === 'chapters' ? { view: 'chapters' } : {}, { replace: true })}
+            options={[
+              { value: 'timeline', label: 'Timeline' },
+              { value: 'chapters', label: `Chapters${data.chapters.length ? ` · ${data.chapters.length}` : ''}` },
+            ]}
+          />
+        </div>
+      )}
       {total === 0 ? (
         <EmptyState
           title="Every story starts somewhere."
@@ -58,6 +74,8 @@ export default function Archive() {
             </Link>
           }
         />
+      ) : view === 'chapters' ? (
+        <ChaptersList data={data} />
       ) : (
         <>
           <div className="pad" style={{ marginBottom: 'var(--s3)' }}>
@@ -108,9 +126,6 @@ export default function Archive() {
               </Fragment>
             ))}
           </div>
-          <p className="pad xs muted" style={{ marginTop: 'var(--s4)' }}>
-            Custom chapters are coming in the next phase.
-          </p>
         </>
       )}
     </main>

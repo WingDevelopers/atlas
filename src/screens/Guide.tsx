@@ -4,6 +4,7 @@ import { BackBar } from '../ui/primitives'
 import {
   IconArchive,
   IconBook,
+  IconCalendar,
   IconCamera,
   IconDreams,
   IconDownload,
@@ -222,8 +223,13 @@ export default function Guide() {
               Your bucket list. Filter by status: <b>Someday → Planning → Booked → Completed</b>. “Still dreaming” shows everything not yet done. Open a dream to change its status with one tap, or press <b>I did it</b>.
             </p>
           </Fold>
-          <Fold icon={<IconArchive />} tint={T.sea} title="Archive" sub="Your timeline, year by year">
-            <p>Adventures, memories and milestones in date order, newest first, grouped by year. Entries without a date sit at the end under “Undated”. Use the search box (it looks inside titles, stories, people and tags) and the filters: Adventures, Memories, Milestones or Favourites.</p>
+          <Fold icon={<IconArchive />} tint={T.sea} title="Archive" sub="Your timeline, year by year — and your chapters">
+            <p>
+              <b>Timeline</b> shows adventures, memories and milestones in date order, newest first, grouped by year. Entries without a date sit at the end under “Undated”. Use the search box (it looks inside titles, stories, people and tags) and the filters: Adventures, Memories, Milestones or Favourites.
+            </p>
+            <p>
+              <b>Chapters</b> (the switch at the top) shows the seasons of your life you’ve named — see “Chapters” below.
+            </p>
             <p className="xs muted">Places and dreams aren’t in the timeline — they live on the Map and Dreams tabs.</p>
           </Fold>
           <Fold icon={<IconMe />} tint={T.sand} title="Me" sub="Totals, backup, settings, this guide">
@@ -297,12 +303,12 @@ export default function Guide() {
           <Fold icon={<IconDreams />} tint={T.sage} title="Dream" sub="A destination, experience, skill — anything">
             <dl className="guide-dl">
               <dt>Fill in</dt>
-              <dd>Title, kind (destination, experience, skill, other), status, photos. More details: why it matters, place, budget estimate, with whom, inspiration links, notes and planning, tags.</dd>
+              <dd>Title, kind (destination, experience, skill, other), status, photos, and — for destinations — <b>Where?</b>: pick one of your places or search a city, country or landmark. More details: why it matters, budget estimate, with whom, inspiration links, notes and planning, tags.</dd>
               <dt>Shows up</dt>
-              <dd>Dreams tab, “Next, maybe?” on Home, and on its place’s page.</dd>
+              <dd>Dreams tab, “Next, maybe?” on Home, its place’s page — and the map: a place found from a dream is saved to your wishlist, so its country turns sea glass. Tap that country and the dream is listed.</dd>
               <dt>When it comes true</dt>
               <dd>
-                Press <b>I did it</b> → create an adventure, create a memory, or just mark it complete. The dream stays in your list as Completed, linked to what you created.
+                Press <b>I did it</b> → create an adventure, create a memory, or just mark it complete. The dream stays in your list as Completed, linked to what you created, and its place turns from wishlist to visited — sea glass becomes coral.
               </dd>
             </dl>
             <Try to="/new/dream">Try: new dream</Try>
@@ -313,8 +319,26 @@ export default function Guide() {
               <dd>Title, date, optional description and photos.</dd>
               <dt>Shows up</dt>
               <dd>Archive timeline (with a sunshine dot) and the Milestones filter.</dd>
+              <dt>Also</dt>
+              <dd>Milestones are where chapters begin. When you save a new one, ATLAS asks: <b>open a new chapter</b> from that day forward, or <b>keep going</b> in the chapter you’re in.</dd>
             </dl>
             <Try to="/new/milestone">Try: new milestone</Try>
+          </Fold>
+          <Fold icon={<IconArchive />} tint={T.sun} title="Chapter" sub="A named season of your life">
+            <p>
+              A chapter gathers adventures, memories and milestones under one name — “The Lisbon Years”, “Starting over”, “University”. It’s a way of reading your story, not a new kind of entry: nothing is copied or moved.
+            </p>
+            <dl className="guide-dl">
+              <dt>Fill in</dt>
+              <dd>Name, what it was about, from/until dates (leave “until” empty for the chapter you’re living now), the entries in it, and a cover from their photos.</dd>
+              <dt>Gathers itself</dt>
+              <dd>With <b>Gather entries by date automatically</b> on (the default for chapters opened from a milestone), everything dated inside the chapter joins it — including what you add later. You can still take entries out, or add older ones by hand.</dd>
+              <dt>Shows up</dt>
+              <dd>Archive → Chapters, and as “In chapters” on each entry’s page.</dd>
+              <dt>Good to know</dt>
+              <dd>An entry can belong to several chapters. Deleting a chapter never deletes its entries; deleting an entry just removes it from its chapters.</dd>
+            </dl>
+            <Try to="/archive?view=chapters">Try: open Chapters</Try>
           </Fold>
         </div>
       </Section>
@@ -338,6 +362,19 @@ export default function Guide() {
                 <>Open each new place and add a pin so it appears on the map.</>,
               ]}
             />
+          </Fold>
+          <Fold icon={<IconCalendar />} tint={T.coral} title="A trip right now vs. places from before ATLAS">
+            <p>ATLAS tells them apart by <b>dates</b> — everything lands in the right spot of your timeline and chapters.</p>
+            <p>
+              <b>On a trip today:</b> + → <b>Adventure</b>, start date today (leave the end empty), add the places as you go. Add <b>memories</b> to it day by day from the adventure’s page. When you’re home, edit it and set the end date.
+            </p>
+            <p>
+              <b>Countries and cities from before:</b> + → <b>Place</b> → <b>Been there</b>, search it, and under More details set <b>First visited</b> to roughly when (the 1st of the month or year is fine). It colours the map right away.
+            </p>
+            <p>
+              <b>A past trip worth its own story:</b> + → <b>Adventure</b> with its real (past) dates. It slots into the right year and is offered to the right chapter.
+            </p>
+            <p className="xs muted">Only adventures, memories and milestones live in the timeline and chapters. Places on their own colour the map and count towards your totals.</p>
           </Fold>
           <Fold icon={<IconPin />} tint={T.sun} title="Put a place on the map">
             <Steps
@@ -382,6 +419,29 @@ export default function Guide() {
             <p>
               Open the memory and tap the <b>♥ Favourite</b> chip (or tick it under More details). Find them all in Archive → Favourites.
             </p>
+          </Fold>
+          <Fold icon={<IconArchive />} tint={T.sun} title="Divide your life into chapters">
+            <Steps
+              items={[
+                <>
+                  Add <b>milestones</b> for the turning points — a move, a new job, a graduation, a breakup, a birth.
+                </>,
+                <>
+                  When you save a milestone, choose <b>Open a new chapter</b> (it runs from that day forward, and the chapter you were in ends the day before) or <b>Keep going</b> in your current chapter. Not sure? <b>Decide later</b> — the suggestion waits in <b>Archive → Chapters</b>.
+                </>,
+                <>
+                  Adding milestones from before ATLAS? Each one is suggested in <b>Archive → Chapters</b> too: tap <b>Create</b> and it slots in between your other chapters, or <b>×</b> for “not now”.
+                </>,
+                <>Rename it to something that feels true, add a sentence about who you were then, and pick a cover.</>,
+                <>
+                  Use <b>Add entries</b> to include or remove anything, and ↑ ↓ (or <b>Sort by date</b>) to set the order.
+                </>,
+                <>
+                  Prefer to start from scratch? <b>+ Chapter</b> at the top of the list.
+                </>,
+              ]}
+            />
+            <p className="xs muted">Chapters can overlap — “Living abroad” and “Learning to cook” can share the same years.</p>
           </Fold>
           <Fold icon={<IconArchive />} tint={T.sea} title="Find something">
             <p>

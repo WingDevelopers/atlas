@@ -114,6 +114,16 @@ describe('dreams', () => {
     expect(after.linkedAdventureId).toBeUndefined()
   })
 
+  it('a dream with a wishlist place: completing it marks the place visited', async () => {
+    const kyoto = await createEntry('place', { name: 'Kyoto', lat: 35.01, lng: 135.77, status: 'wishlist' }, db)
+    const d = await createEntry('dream', { title: 'Cherry blossoms', placeId: kyoto.id }, db)
+    expect((await db.places.get(kyoto.id))!.status).toBe('wishlist')
+    await completeDream(d.id, { as: 'adventure', data: {}, completedOn: '2027-04-02' }, db)
+    const after = (await db.places.get(kyoto.id))!
+    expect(after.status).toBe('visited')
+    expect(after.visitedOn).toBe('2027-04-02')
+  })
+
   it('completes into a memory', async () => {
     const d = await createEntry('dream', { title: 'Swim in a cenote' }, db)
     const { dream, created } = await completeDream(d.id, { as: 'memory', data: {} }, db)

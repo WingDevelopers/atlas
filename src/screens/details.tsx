@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { completeDream, deleteEntry, getEntry, restoreSnapshot, updateEntry } from '../db/repo'
 import { DREAM_STATUSES, ENTRY_LABEL, type DreamStatus, type EntryMap, type EntryType } from '../db/types'
 import { coverOf, useAll, visitsFor, type AllData } from '../lib/queries'
+import { chapterCover, chaptersContaining } from '../lib/chapters'
 import { Art } from '../ui/Art'
 import { Cover, Loading, Photo, Segmented, Sheet, useConfirm, useToast } from '../ui/primitives'
 import { IconBack, IconCheck, IconClose, IconEdit, IconHeart, IconMap, IconPlus, IconTrash } from '../ui/icons'
@@ -162,7 +163,7 @@ function Tags({ tags }: { tags?: string[] }) {
   )
 }
 
-type Linkable = { kind: EntryType; id: string; title: string; sub?: string; cover?: string }
+type Linkable = { kind: EntryType | 'chapter'; id: string; title: string; sub?: string; cover?: string }
 function LinkedList({ title, items, empty }: { title: string; items: Linkable[]; empty?: ReactNode }) {
   if (!items.length && !empty) return null
   return (
@@ -187,6 +188,12 @@ function LinkedList({ title, items, empty }: { title: string; items: Linkable[];
       )}
     </section>
   )
+}
+
+function InChapters({ type, id, all }: { type: 'adventure' | 'memory' | 'milestone'; id: string; all: AllData }) {
+  const chs = chaptersContaining(type, id, all)
+  if (!chs.length) return null
+  return <LinkedList title="In chapters" items={chs.map((c) => ({ kind: 'chapter', id: c.id, title: c.title, sub: 'Chapter', cover: chapterCover(c, all) }))} />
 }
 
 const placeItem = (p: AllData['places'][number]): Linkable => ({ kind: 'place', id: p.id, title: p.name, sub: [p.status === 'visited' ? 'Visited' : 'Wishlist', placeLine(p)].filter(Boolean).join(' · '), cover: coverOf(p) })
@@ -240,6 +247,7 @@ export function AdventureDetail() {
           <IconPlus /> Add another memory
         </Link>
       )}
+      <InChapters type="adventure" id={a.id} all={all} />
     </DetailLayout>
   )
 }
@@ -281,6 +289,7 @@ export function MemoryDetail() {
       <Facts items={[['People', m.people], ['Adventure', adv && <Link to={`/adventure/${adv.id}`}>{adv.title}</Link>], ['From a dream', dream && <Link to={`/dream/${dream.id}`}>{dream.title}</Link>]]} />
       <Tags tags={m.tags} />
       {place && <LinkedList title="Place" items={[placeItem(place)]} />}
+      <InChapters type="memory" id={m.id} all={all} />
     </DetailLayout>
   )
 }
@@ -289,11 +298,18 @@ export function MemoryDetail() {
 
 export function MilestoneDetail() {
   const m = useEntry('milestone')
-  if (m === undefined) return <Loading />
+  const all = useAll()
+  if (m === undefined || !all) return <Loading />
   if (m === null) return <NotFound />
   return (
     <DetailLayout type="milestone" rec={m} title={m.title} chips={<span className="chip planning">Milestone</span>} meta={fmtDate(m.date)}>
       {m.description ? <p className="story">{m.description}</p> : <p className="muted">A moment that mattered.</p>}
+      <InChapters type="milestone" id={m.id} all={all} />
+      {chaptersContaining('milestone', m.id, all).length === 0 && (
+        <Link to={`/new/chapter?suggest=${m.id}&with=milestone:${m.id}`} className="btn btn-sea btn-sm" style={{ alignSelf: 'flex-start' }}>
+          Start a chapter here
+        </Link>
+      )}
     </DetailLayout>
   )
 }

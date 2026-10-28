@@ -3,6 +3,7 @@ import { getDb, type AtlasDB } from './db'
 import type {
   Adventure,
   Chapter,
+  ChapterItem,
   Dream,
   EntryMap,
   EntryType,
@@ -243,6 +244,17 @@ export async function deleteEntry(type: EntryType, id: string, db: AtlasDB = get
       }
     }
 
+    // chapters whose cover was one of the photos being deleted lose that cover
+    if (media.length) {
+      const ids = new Set(media.map((m) => m.id))
+      const covered = await db.chapters.filter((c) => !!c.coverId && ids.has(c.coverId)).toArray()
+      for (const c of covered) {
+        if (!touched.chapters.some((t) => t.id === c.id)) touched.chapters.push(c)
+        const current = (await db.chapters.get(c.id))!
+        const { coverId: _c, ...rest } = current
+        await db.chapters.put({ ...rest, updatedAt: ts })
+      }
+    }
     await db.media.bulkDelete(media.map((m) => m.id))
     await tableFor(type, db).delete(id)
     return { deleted: { type, record }, media, touched }
@@ -284,10 +296,15 @@ export async function completeDream(
     | { as: 'memory'; data: Partial<Memory>; completedOn?: string },
   db: AtlasDB = getDb(),
 ) {
-  return db.transaction('rw', [db.dreams, db.adventures, db.memories], async () => {
+  return db.transaction('rw', [db.dreams, db.adventures, db.memories, db.places], async () => {
     const dream = await db.dreams.get(dreamId)
     if (!dream) throw new Error('That dream no longer exists.')
     const completedOn = opts.completedOn ?? todayIso()
+    // You went! The dream's place moves from wishlist to visited.
+    if (dream.placeId) {
+      const place = await db.places.get(dream.placeId)
+      if (place && place.status === 'wishlist') await updateEntry('place', place.id, { status: 'visited', visitedOn: place.visitedOn ?? completedOn }, db)
+    }
     const patch: Partial<Dream> = { status: 'completed', completedOn }
     let created: Adventure | Memory | undefined
     if (opts.as === 'adventure') {
@@ -314,4 +331,120 @@ export async function wipeAll(db: AtlasDB = getDb()) {
   await db.transaction('rw', [db.places, db.adventures, db.memories, db.milestones, db.dreams, db.chapters, db.media], async () => {
     await Promise.all([db.places.clear(), db.adventures.clear(), db.memories.clear(), db.milestones.clear(), db.dreams.clear(), db.chapters.clear(), db.media.clear()])
   })
+}
+
+/* ------------------------------------------------------------------ */
+/* Chapters                                                            */
+/* ------------------------------------------------------------------ */
+
+export function validateChapter(c: Partial<Chapter>) {
+  requireText('title', c.title, 'This chapter')
+  optDate('startDate', c.startDate)
+  optDate('endDate', c.endDate)
+  if (c.startDate && c.endDate && c.endDate < c.startDate) throw new ValidationError('endDate', 'The end date is before the start.')
+  for (const i of c.items ?? []) if (!['adventure', 'memory', 'milestone'].includes(i.type) || typeof i.id !== 'string') throw new ValidationError('items', 'One of the entries isn’t valid.')
+}
+
+export async function createChapter(data: Partial<Chapter>, db: AtlasDB = getDb()): Promise<Chapter> {
+  const ts = nowIso()
+  const rec = clean({ title: '', description: '', items: [], ...data, id: data.id ?? newId(), createdAt: ts, updatedAt: ts }) as Chapter
+  rec.title = rec.title.trim()
+  rec.items = dedupeItems(rec.items)
+  validateChapter(rec)
+  await db.chapters.add(rec)
+  return rec
+}
+
+export async function updateChapter(id: string, patch: Partial<Chapter>, db: AtlasDB = getDb()): Promise<Chapter> {
+  const existing = await db.chapters.get(id)
+  if (!existing) throw new Error('That chapter no longer exists.')
+  const merged = { ...existing, ...patch, id, createdAt: existing.createdAt, updatedAt: nowIso() } as Record<string, unknown>
+  for (const [k, v] of Object.entries(patch)) if ((v === undefined || v === '') && !REQUIRED_STRINGS.has(k)) delete merged[k]
+  const rec = merged as unknown as Chapter
+  if (typeof rec.title === 'string') rec.title = rec.title.trim()
+  rec.items = dedupeItems(rec.items ?? [])
+  validateChapter(rec)
+  await db.chapters.put(rec)
+  return rec
+}
+
+/** Deleting a chapter never deletes its entries. Returns the chapter for undo. */
+export async function deleteChapter(id: string, db: AtlasDB = getDb()): Promise<Chapter | undefined> {
+  const c = await db.chapters.get(id)
+  if (c) await db.chapters.delete(id)
+  return c
+}
+
+export async function restoreChapter(c: Chapter, db: AtlasDB = getDb()) {
+  await db.chapters.put(c)
+}
+
+function dedupeItems(items: Chapter['items']) {
+  const seen = new Set<string>()
+  return items.filter((i) => {
+    const k = i.type + ':' + i.id
+    if (seen.has(k)) return false
+    seen.add(k)
+    return true
+  })
+}
+
+const dayBeforeIso = (iso: string) => {
+  const d = new Date(iso + 'T12:00:00Z')
+  d.setUTCDate(d.getUTCDate() - 1)
+  return d.toISOString().slice(0, 10)
+}
+
+/** The chapter whose date range contains `date` (latest start wins), if any. */
+export async function chapterOn(date: string, db: AtlasDB = getDb(), exceptId?: string): Promise<Chapter | undefined> {
+  const all = await db.chapters.toArray()
+  return all
+    .filter((c) => c.id !== exceptId && c.startDate && c.startDate <= date && (!c.endDate || c.endDate >= date))
+    .sort((a, b) => b.startDate!.localeCompare(a.startDate!))[0]
+}
+
+/**
+ * Open a new chapter at a milestone: it runs from the milestone's date forward
+ * (until the next chapter that starts later, or ongoing), gathers entries in
+ * that range automatically, and the chapter that was running closes the day before.
+ */
+export async function openChapterAt(milestoneId: string, overrides: Partial<Chapter> = {}, db: AtlasDB = getDb()) {
+  return db.transaction('rw', [db.chapters, db.milestones], async () => {
+    const m = await db.milestones.get(milestoneId)
+    if (!m) throw new Error('That milestone no longer exists.')
+    const all = await db.chapters.toArray()
+    const next = all
+      .filter((c) => c.startDate && c.startDate > m.date)
+      .sort((a, b) => a.startDate!.localeCompare(b.startDate!))[0]
+    const running = await chapterOn(m.date, db)
+    let closed: Chapter | undefined
+    if (running && running.startDate! < m.date) {
+      closed = await updateChapter(running.id, { endDate: dayBeforeIso(m.date) }, db)
+    }
+    const created = await createChapter(
+      {
+        title: m.title,
+        description: '',
+        startDate: m.date,
+        endDate: next ? dayBeforeIso(next.startDate!) : undefined,
+        items: [{ type: 'milestone', id: m.id }],
+        suggestedFrom: m.id,
+        autoInclude: true,
+        ...overrides,
+      },
+      db,
+    )
+    return { created, closed, previous: running }
+  })
+}
+
+/** Keep going: add a milestone to the chapter that's running on its date. */
+export async function addToChapter(chapterId: string, item: ChapterItem, db: AtlasDB = getDb()) {
+  const c = await db.chapters.get(chapterId)
+  if (!c) throw new Error('That chapter no longer exists.')
+  return updateChapter(
+    chapterId,
+    { items: [...c.items, item], excluded: (c.excluded ?? []).filter((x) => !(x.type === item.type && x.id === item.id)) },
+    db,
+  )
 }

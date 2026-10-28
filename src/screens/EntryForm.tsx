@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { completeDream, createEntry, getEntry, todayIso, updateEntry, ValidationError } from '../db/repo'
+import { addToChapter, chapterOn, completeDream, createEntry, getEntry, openChapterAt, todayIso, updateEntry, ValidationError } from '../db/repo'
 import { addPhotos, removePhoto } from '../db/media'
-import { DREAM_STATUSES, DREAM_TYPES, ENTRY_LABEL, PLACE_CATEGORIES, type EntryMap, type EntryType } from '../db/types'
-import { BackBar, Loading, Photo, Segmented, useToast } from '../ui/primitives'
+import { DREAM_STATUSES, DREAM_TYPES, ENTRY_LABEL, PLACE_CATEGORIES, type Chapter, type EntryMap, type EntryType, type Milestone } from '../db/types'
+import { BackBar, Loading, Photo, Segmented, Sheet, useToast } from '../ui/primitives'
 import { IconCamera, IconClose, IconHeart } from '../ui/icons'
 import { LocationPicker } from '../map/LocationPicker'
+import { searchWorld, type GeoResult } from '../map/leaflet'
 import { useAll } from '../lib/queries'
 import { cap, splitTags } from '../lib/format'
 
@@ -113,6 +114,7 @@ export default function EntryForm() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
   const [newPlace, setNewPlace] = useState('')
+  const [askChapter, setAskChapter] = useState<{ milestone: Milestone; running?: Chapter } | null>(null)
 
   // Load existing entry, or prefill a new one
   useEffect(() => {
@@ -177,13 +179,25 @@ export default function EntryForm() {
   const str = (k: string) => (draft[k] as string | undefined) ?? ''
   const titleKey = type === 'place' ? 'name' : 'title'
 
-  async function quickAddPlace() {
-    const name = newPlace.trim()
+  /** Dreams create wishlist places; adventures and memories create visited ones. */
+  const newPlaceStatus = type === 'dream' ? 'wishlist' : 'visited'
+  async function quickAddPlace(found?: GeoResult) {
+    const name = (found?.name ?? newPlace).trim()
     if (!name) return
-    const p = await createEntry('place', { name, status: 'visited' })
+    // reuse an existing place with the same name rather than creating a twin
+    const twin = sortedPlaces.find((p) => p.name.toLowerCase() === name.toLowerCase())
+    const p =
+      twin ??
+      (await createEntry('place', {
+        name,
+        status: newPlaceStatus,
+        ...(found ? { lat: Math.round(found.lat * 1e5) / 1e5, lng: Math.round(found.lng * 1e5) / 1e5, country: found.country, region: found.region } : {}),
+      }))
     setNewPlace('')
-    if (type === 'adventure') set('placeIds', [...((draft!.placeIds as string[]) ?? []), p.id])
-    else set('placeId', p.id)
+    if (type === 'adventure') {
+      const ids = (draft!.placeIds as string[]) ?? []
+      if (!ids.includes(p.id)) set('placeIds', [...ids, p.id])
+    } else set('placeId', p.id)
   }
 
   async function save(e: React.FormEvent) {
@@ -221,6 +235,12 @@ export default function EntryForm() {
       if (photos.pending.length) await addPhotos(type, id, photos.pending)
       if (photos.coverId && photos.kept.includes(photos.coverId)) await updateEntry(type, id, { coverId: photos.coverId } as never)
 
+      if (type === 'milestone' && !editId) {
+        // A new milestone can open a new chapter of your life
+        const milestone = (await getEntry('milestone', id))!
+        setAskChapter({ milestone, running: await chapterOn(milestone.date) })
+        return
+      }
       toast({ message: editId ? 'Saved.' : fromDream ? 'Dream complete — and kept.' : `${ENTRY_LABEL[type]} added.` })
       nav(`/${type}/${id}`, { replace: true })
     } catch (err) {
@@ -243,7 +263,7 @@ export default function EntryForm() {
           </option>
         ))}
       </select>
-      <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} />
+      <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} status={newPlaceStatus} />
     </Field>
   )
 
@@ -328,6 +348,9 @@ export default function EntryForm() {
                 <Segmented label="Dream status" value={(str('status') || 'someday') as never} options={DREAM_STATUSES.map((t) => ({ value: t, label: cap(t) }))} onChange={(v) => set('status', v)} />
               </div>
             )}
+            {(str('type') || 'destination') === 'destination' && (
+              placeSelect('placeId', 'Where? (optional)')
+            )}
           </>
         )}
 
@@ -356,7 +379,7 @@ export default function EntryForm() {
                       )
                     })}
                   </div>
-                  <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} />
+                  <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} status={newPlaceStatus} />
                 </div>
                 <Field label="The story" id="story">
                   <textarea id="story" className="textarea" value={str('story')} onChange={(e) => set('story', e.target.value)} placeholder="How did it feel? What surprised you?" />
@@ -444,7 +467,7 @@ export default function EntryForm() {
                 <Field label="Why it matters" id="why">
                   <textarea id="why" className="textarea" style={{ minHeight: 90 }} value={str('why')} onChange={(e) => set('why', e.target.value)} />
                 </Field>
-                {placeSelect('placeId', 'Place (optional)')}
+                {str('type') !== 'destination' && placeSelect('placeId', 'Where? (optional)')}
                 <div className="field-row">
                   <Field label="Budget estimate" id="budget">
                     <input id="budget" className="input" value={str('budget')} onChange={(e) => set('budget', e.target.value)} placeholder="e.g. $2,000" />
@@ -479,6 +502,61 @@ export default function EntryForm() {
           </p>
         )}
       </form>
+      <Sheet
+        open={!!askChapter}
+        onClose={() => {
+          const m = askChapter?.milestone
+          setAskChapter(null)
+          if (m) nav(`/milestone/${m.id}`, { replace: true })
+        }}
+        label="Open a new chapter?"
+      >
+        {askChapter && (
+          <div className="stack">
+            <h2>A new chapter?</h2>
+            <p className="small muted">
+              “{askChapter.milestone.title}” could open a new chapter of your life, from {askChapter.milestone.date ? new Date(askChapter.milestone.date + 'T12:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) : 'today'} forward.
+              {askChapter.running && <> Right now you’re in “{askChapter.running.title}”.</>}
+            </p>
+            <button
+              className="btn btn-primary btn-block"
+              onClick={async () => {
+                const { created, closed } = await openChapterAt(askChapter.milestone.id)
+                setAskChapter(null)
+                toast({ message: closed ? `New chapter opened. “${closed.title}” ends the day before.` : 'New chapter opened — give it a name.' })
+                nav(`/edit/chapter/${created.id}`, { replace: true })
+              }}
+            >
+              Open a new chapter
+            </button>
+            {askChapter.running && (
+              <button
+                className="btn btn-secondary btn-block"
+                onClick={async () => {
+                  await addToChapter(askChapter.running!.id, { type: 'milestone', id: askChapter.milestone.id })
+                  const m = askChapter.milestone
+                  setAskChapter(null)
+                  toast({ message: `Added to “${askChapter.running!.title}”.` })
+                  nav(`/milestone/${m.id}`, { replace: true })
+                }}
+              >
+                Keep going in “{askChapter.running.title}”
+              </button>
+            )}
+            <button
+              className="btn btn-ghost btn-block"
+              onClick={() => {
+                const m = askChapter.milestone
+                setAskChapter(null)
+                toast({ message: 'Milestone added. The chapter suggestion waits in Archive → Chapters.' })
+                nav(`/milestone/${m.id}`, { replace: true })
+              }}
+            >
+              Decide later
+            </button>
+          </div>
+        )}
+      </Sheet>
       <div className="form-actions">
         <button type="button" className="btn btn-secondary" onClick={() => nav(-1)}>
           Cancel
@@ -491,26 +569,81 @@ export default function EntryForm() {
   )
 }
 
-function QuickPlace({ value, onChange, onAdd }: { value: string; onChange: (v: string) => void; onAdd: () => void }) {
+function QuickPlace({ value, onChange, onAdd, status }: { value: string; onChange: (v: string) => void; onAdd: (found?: GeoResult) => void; status: 'visited' | 'wishlist' }) {
+  const [results, setResults] = useState<GeoResult[] | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  async function find() {
+    const q = value.trim()
+    if (!q) return
+    setBusy(true)
+    setErr('')
+    try {
+      setResults(await searchWorld(q))
+    } catch {
+      setResults(null)
+      setErr('Search needs internet — you can still add it by name and pin it later.')
+    } finally {
+      setBusy(false)
+    }
+  }
+  const done = (found?: GeoResult) => {
+    onAdd(found)
+    setResults(null)
+    setErr('')
+  }
   return (
-    <div className="row" style={{ gap: 8 }}>
-      <input
-        className="input"
-        style={{ minHeight: 40 }}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="New place name…"
-        aria-label="New place name"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault()
-            onAdd()
-          }
-        }}
-      />
-      <button type="button" className="btn btn-sm btn-sea" onClick={onAdd} disabled={!value.trim()}>
-        Add
-      </button>
+    <div className="quick-place">
+      <div className="row" style={{ gap: 8 }}>
+        <input
+          className="input"
+          style={{ minHeight: 40 }}
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value)
+            setResults(null)
+          }}
+          placeholder={status === 'wishlist' ? 'Search a city, country or landmark…' : 'New place — search a city or country…'}
+          aria-label="Find a new place"
+          enterKeyHint="search"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              find()
+            }
+          }}
+        />
+        <button type="button" className="btn btn-sm btn-sea" onClick={find} disabled={!value.trim() || busy}>
+          {busy ? '…' : 'Find'}
+        </button>
+      </div>
+      {results && (
+        <div className="search-results" style={{ boxShadow: 'none', border: '1px solid var(--line)', marginTop: 8 }}>
+          {results.length === 0 && <div style={{ padding: 12 }} className="small muted">No matches.</div>}
+          {results.map((r, i) => (
+            <button type="button" key={i} onClick={() => done(r)}>
+              <b>{r.name}</b>
+              <div className="xs muted">{r.detail}</div>
+            </button>
+          ))}
+          <button type="button" onClick={() => done()}>
+            <span className="small">
+              Add “{value.trim()}” without a pin
+            </span>
+          </button>
+        </div>
+      )}
+      {err && (
+        <div className="row" style={{ marginTop: 6 }}>
+          <span className="xs muted spacer">{err}</span>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => done()}>
+            Add by name
+          </button>
+        </div>
+      )}
+      <span className="xs muted" style={{ display: 'block', marginTop: 4 }}>
+        New places are saved as {status === 'wishlist' ? 'wishlist (sea glass on the map)' : 'visited (coral on the map)'}.
+      </span>
     </div>
   )
 }

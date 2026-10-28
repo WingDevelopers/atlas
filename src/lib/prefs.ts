@@ -8,10 +8,12 @@ export interface Prefs {
   welcomed: boolean
   /** Quick tour seen (or skipped). */
   toured: boolean
+  /** Chapter suggestions the owner said “not now” to (milestone ids). */
+  dismissedChapters: string[]
 }
 
 const KEY = 'atlas.prefs'
-const DEFAULTS: Prefs = { name: '', text: 'normal', motion: 'system', welcomed: false, toured: false }
+const DEFAULTS: Prefs = { name: '', text: 'normal', motion: 'system', welcomed: false, toured: false, dismissedChapters: [] }
 const listeners = new Set<() => void>()
 
 function read(): Prefs {

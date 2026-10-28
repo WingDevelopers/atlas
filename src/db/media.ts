@@ -141,9 +141,14 @@ export async function removePhoto(mediaId: string, db: AtlasDB = getDb()) {
     return
   }
   const table = tableFor(m.ownerType as EntryType, db)
-  await db.transaction('rw', [db.media, table], async () => {
+  await db.transaction('rw', [db.media, table, db.chapters], async () => {
     const owner = (await table.get(m.ownerId)) as unknown as WithPhotos | undefined
     await db.media.delete(mediaId)
+    const covered = await db.chapters.filter((c) => c.coverId === mediaId).toArray()
+    for (const c of covered) {
+      const { coverId: _c, ...rest } = c
+      await db.chapters.put({ ...rest, updatedAt: nowIso() })
+    }
     if (owner) {
       const photoIds = owner.photoIds.filter((id) => id !== mediaId)
       const coverId = owner.coverId === mediaId ? photoIds[0] : owner.coverId

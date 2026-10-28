@@ -297,6 +297,18 @@ export default function MapScreen() {
               </button>
             </div>
             <div className="country-places">
+              {(() => {
+                const ids = new Set(selCountry.places.map((p) => p.id))
+                return data.dreams
+                  .filter((d) => d.placeId && ids.has(d.placeId) && d.status !== 'completed')
+                  .map((d) => (
+                    <Link key={d.id} to={`/dream/${d.id}`} className="country-place">
+                      <span className="dot wishlist" aria-hidden />
+                      <span className="spacer">{d.title}</span>
+                      <span className="xs muted">Dream · {d.status}</span>
+                    </Link>
+                  ))
+              })()}
               {selCountry.places.slice(0, 6).map((p) => (
                 <Link key={p.id} to={`/place/${p.id}`} className="country-place">
                   <span className={`dot ${p.status}`} aria-hidden />

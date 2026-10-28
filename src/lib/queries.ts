@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getDb } from '../db/db'
-import type { Adventure, Dream, Memory, Milestone, Place } from '../db/types'
+import type { Adventure, Chapter, Dream, Memory, Milestone, Place } from '../db/types'
 
 export interface AllData {
   places: Place[]
@@ -8,20 +8,22 @@ export interface AllData {
   memories: Memory[]
   milestones: Milestone[]
   dreams: Dream[]
+  chapters: Chapter[]
 }
 
 /** Live view of every record. Fine for a personal-scale atlas (thousands of entries). */
 export function useAll(): AllData | undefined {
   return useLiveQuery(async () => {
     const db = getDb()
-    const [places, adventures, memories, milestones, dreams] = await Promise.all([
+    const [places, adventures, memories, milestones, dreams, chapters] = await Promise.all([
       db.places.toArray(),
       db.adventures.toArray(),
       db.memories.toArray(),
       db.milestones.toArray(),
       db.dreams.toArray(),
+      db.chapters.toArray(),
     ])
-    return { places, adventures, memories, milestones, dreams }
+    return { places, adventures, memories, milestones, dreams, chapters }
   }, [])
 }
 

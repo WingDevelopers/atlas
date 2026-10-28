@@ -121,8 +121,19 @@ export interface Chapter extends BaseRecord {
   description: string
   startDate?: ISODate
   endDate?: ISODate
+  /** Media id of a photo from one of its entries, used as the cover. */
   coverId?: string
   items: ChapterItem[]
+  /** Set when the chapter was created from a suggestion (the milestone it starts with). */
+  suggestedFrom?: string
+  /**
+   * When true, every adventure, memory and milestone dated inside the chapter's
+   * from/until range belongs to it automatically (minus `excluded`), shown in date order.
+   * Chapters opened from a milestone work this way.
+   */
+  autoInclude?: boolean
+  /** Entries taken out of an automatic chapter by hand. */
+  excluded?: ChapterItem[]
 }
 
 export type OwnerType = 'place' | 'adventure' | 'memory' | 'milestone' | 'dream' | 'chapter'
