@@ -53,6 +53,24 @@ export interface Place extends BaseRecord, WithPhotos {
   visitedOn?: ISODate
   tags: string[]
   notes: string
+  /**
+   * The place's real outline (e.g. Orlando's city boundary), looked up once
+   * from OpenStreetMap and kept on the device. Shown on the map when zoomed in.
+   */
+  area?: PlaceArea
+  /** When an outline lookup was last tried (so we don't keep asking). */
+  areaTriedAt?: Timestamp
+}
+
+export interface PlaceArea {
+  name: string
+  kind?: string
+  /** GeoJSON Polygon or MultiPolygon, coordinates rounded to ~10 m. */
+  geometry: { type: 'Polygon'; coordinates: number[][][] } | { type: 'MultiPolygon'; coordinates: number[][][][] }
+  /** The pin the outline was looked up for. */
+  forLat: number
+  forLng: number
+  source: 'openstreetmap'
 }
 
 export interface Adventure extends BaseRecord, WithPhotos {

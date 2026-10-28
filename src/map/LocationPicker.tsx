@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import { pinIcon, searchWorld, TILE_OPTIONS, type GeoResult } from './leaflet'
-import { IconLocate, IconSearch } from '../ui/icons'
+import { pinIcon, TILE_OPTIONS } from './leaflet'
+import { PlaceSearch } from './PlaceSearch'
+import { IconLocate } from '../ui/icons'
 
 export interface PickedLocation {
   lat?: number
@@ -29,24 +30,8 @@ const round = (n: number) => Math.round(n * 1e5) / 1e5
  * the button) use your current location. Nothing happens automatically.
  */
 export function LocationPicker({ value, onChange }: { value: PickedLocation; onChange: (v: PickedLocation) => void }) {
-  const [q, setQ] = useState('')
-  const [results, setResults] = useState<GeoResult[] | null>(null)
-  const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   const has = value.lat !== undefined && value.lng !== undefined
-
-  async function search() {
-    if (!q.trim()) return
-    setBusy(true)
-    setErr('')
-    try {
-      setResults(await searchWorld(q.trim()))
-    } catch {
-      setErr('World search needs an internet connection. You can still tap the map to drop a pin.')
-    } finally {
-      setBusy(false)
-    }
-  }
 
   function locate() {
     if (!navigator.geolocation) return setErr('Location isn’t available on this device.')
@@ -60,43 +45,13 @@ export function LocationPicker({ value, onChange }: { value: PickedLocation; onC
 
   return (
     <div className="stack" style={{ gap: 8 }}>
-      <div className="searchbar" style={{ boxShadow: 'none', border: '1px solid var(--line-strong)' }}>
-        <IconSearch />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              search()
-            }
-          }}
-          placeholder="Search a city, park, address…"
-          aria-label="Search the world map"
-          enterKeyHint="search"
-        />
-        <button type="button" className="btn btn-sm btn-sea" onClick={search} disabled={busy}>
-          {busy ? '…' : 'Search'}
-        </button>
-      </div>
-      {results && (
-        <div className="search-results" style={{ boxShadow: 'none', border: '1px solid var(--line)' }}>
-          {results.length === 0 && <div style={{ padding: 12 }} className="small muted">No matches. Try a nearby town, or tap the map.</div>}
-          {results.map((r, i) => (
-            <button
-              type="button"
-              key={i}
-              onClick={() => {
-                onChange({ lat: round(r.lat), lng: round(r.lng), country: r.country, region: r.region, name: r.name })
-                setResults(null)
-              }}
-            >
-              <b>{r.name}</b>
-              <div className="xs muted">{r.detail}</div>
-            </button>
-          ))}
-        </div>
-      )}
+      <PlaceSearch
+        places={[]}
+        onPickExisting={() => {}}
+        onPickNew={(r) => onChange({ lat: round(r.lat), lng: round(r.lng), country: r.country, region: r.region, name: r.name })}
+        label="Search the world map"
+        placeholder="Type a city, park, address…"
+      />
       <div className="picker-map">
         <MapContainer center={has ? [value.lat!, value.lng!] : [20, 0]} zoom={has ? 10 : 2} scrollWheelZoom worldCopyJump>
           <TileLayer {...TILE_OPTIONS} />

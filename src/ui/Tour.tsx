@@ -27,7 +27,7 @@ const STEPS: Step[] = [
     target: '/map',
     icon: <IconMap />,
     title: 'Map',
-    text: 'Countries you’ve been to fill with coral; wishlist countries with sea glass. Tap a country, or zoom in to see each place’s pin.',
+    text: 'Countries you’ve been to fill with coral; wishlist countries with sea glass. Zoom in and the colour narrows to the places themselves — a city, a park, a town.',
   },
   {
     target: '/dreams',

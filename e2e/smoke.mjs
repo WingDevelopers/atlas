@@ -20,6 +20,19 @@ await page.route(/photon\.komoot\.io/, (r) =>
     ? r.fulfill({ json: { features: [{ geometry: { coordinates: [-73.4068, -50.9423] }, properties: { name: 'Torres del Paine', country: 'Chile', state: 'Magallanes' } }] } })
     : r.fulfill({ json: { features: [{ geometry: { coordinates: [-9.1393, 38.7223] }, properties: { name: 'Lisbon', country: 'Portugal', state: 'Lisbon' } }] } }),
 )
+// Place outlines (Nominatim): a small square around whatever pin is asked about
+await page.route(/nominatim\.openstreetmap\.org/, (r) => {
+  const u = new URL(r.request().url())
+  let lat = Number(u.searchParams.get('lat')), lng = Number(u.searchParams.get('lon'))
+  const vb = u.searchParams.get('viewbox')
+  if (vb) {
+    const [x1, y1, x2, y2] = vb.split(',').map(Number)
+    lat = (y1 + y2) / 2
+    lng = (x1 + x2) / 2
+  }
+  const d = 0.08
+  return r.fulfill({ json: { type: 'FeatureCollection', features: [{ type: 'Feature', properties: { name: u.searchParams.get('q') ?? 'Town', addresstype: 'city' }, geometry: { type: 'Polygon', coordinates: [[[lng - d, lat - d], [lng + d, lat - d], [lng + d, lat + d], [lng - d, lat + d], [lng - d, lat - d]]] } }] } })
+})
 const shot = (n) => page.screenshot({ path: `${OUT}/${n}.png` })
 
 await page.goto(BASE)
@@ -64,8 +77,7 @@ step('memory in one title')
 await page.goto(BASE + '#/new/place')
 await page.locator('#title').fill('')
 await page.getByLabel('Search the world map').fill('Lisbon')
-await page.getByRole('button', { name: 'Search', exact: true }).click()
-await page.getByRole('button', { name: /Lisbon/ }).first().click()
+await page.getByRole('option', { name: /Lisbon/ }).first().click()
 await page.locator('input[type=file]').setInputFiles('public/icon-512.png')
 await page.waitForTimeout(300)
 await shot('03-place-form')
@@ -85,7 +97,8 @@ await page.goto(BASE + '#/new/adventure')
 await page.locator('#title').fill('Spring in Lisbon')
 await page.locator('#startDate').fill('2026-04-10')
 await page.locator('#endDate').fill('2026-04-16')
-await page.getByLabel('Add one of your places').selectOption({ label: 'Lisbon' })
+await page.getByLabel('Where — search').fill('lis')
+await page.getByRole('option', { name: /Lisbon/ }).first().click() // “Your places” comes first
 await page.getByRole('button', { name: 'Remove Lisbon' }).waitFor() // chosen place shows as a chip
 await page.getByRole('button', { name: /More details/ }).click()
 await page.locator('#story').fill('Trams, tiles, and long golden evenings.')
@@ -122,11 +135,10 @@ step('dream → linked adventure, dream preserved')
 // Destination dream with a location found by search → becomes a wishlist place
 await page.goto(BASE + '#/new/dream')
 await page.locator('#title').fill('Hike Patagonia')
-await page.getByLabel('Find a new place').fill('Torres del Paine')
-await page.getByRole('button', { name: 'Find', exact: true }).click()
-await page.getByRole('button', { name: /Torres del Paine/ }).first().click()
-await page.waitForTimeout(300)
-if ((await page.locator('#placeId').inputValue()) === '') throw new Error('dream place not linked')
+await page.getByLabel('Where? (optional) — search').fill('Torres del Paine')
+await page.getByRole('option', { name: /Torres del Paine/ }).first().click()
+await page.getByRole('button', { name: 'Remove Torres del Paine' }).waitFor()
+await page.getByText('On your wishlist — sea glass on the map.').waitFor()
 await shot('06b-dream-where')
 await page.getByRole('button', { name: 'Save' }).click()
 await page.getByRole('heading', { name: 'Hike Patagonia' }).waitFor()
@@ -218,12 +230,16 @@ await page.locator('.map-page path.leaflet-interactive[fill="#D77C66"]').dispatc
 await page.getByRole('dialog', { name: 'Portugal' }).waitFor()
 await shot('10b-map-country-card')
 await page.getByRole('button', { name: 'Zoom in' }).click()
-await page.locator('.atlas-pin.visited').first().waitFor()
-await page.waitForTimeout(600)
-await page.locator('.atlas-pin.visited').first().click()
+await page.waitForTimeout(800)
+// zoomed in: countries back to normal, places shown as their own coloured areas
+if (await page.locator('.map-page path.atlas-country').count()) throw new Error('countries should not be filled when zoomed in')
+await page.locator('.map-page path.atlas-area.visited').first().waitFor()
+if (await page.locator('.atlas-pin').count()) throw new Error('no pins when zoomed in — areas instead')
+await shot('10c-map-areas')
+await page.locator('.map-page path.atlas-area.visited').first().dispatchEvent('click')
 await page.getByRole('link', { name: 'View memories' }).waitFor()
 await shot('10-map')
-step('map: filled countries, filter, country card, zoom → pins, preview')
+step('map: filled countries, filter, country card, zoom → place areas, preview')
 
 // Delete with undo
 await page.goto(BASE + '#/')

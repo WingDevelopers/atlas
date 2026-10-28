@@ -2149,3 +2149,63 @@ button.card:active {
   min-width: 0;
   max-width: 100%;
 }
+
+/* Place search (type-ahead) */
+.place-search {
+  position: relative;
+}
+.place-search .search-results button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.place-search .search-results .dot,
+.place-chip .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--coral);
+  flex: none;
+}
+.place-search .search-results .dot.wishlist,
+.place-chip .dot.wishlist {
+  background: var(--sea-glass);
+}
+.sr-head {
+  padding: 10px 16px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.sr-note {
+  padding: 8px 16px 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.place-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 4px 4px 14px;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  background: var(--coral-tint);
+  color: #8d3f2c;
+}
+.place-chip.wishlist {
+  background: var(--sea-tint);
+  color: #2d5c5e;
+}
+.place-chip button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 253, 248, 0.7);
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+}

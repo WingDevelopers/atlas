@@ -6,7 +6,8 @@ import { DREAM_STATUSES, DREAM_TYPES, ENTRY_LABEL, PLACE_CATEGORIES, type Chapte
 import { BackBar, Loading, Photo, Segmented, Sheet, useToast } from '../ui/primitives'
 import { IconCamera, IconClose, IconHeart } from '../ui/icons'
 import { LocationPicker } from '../map/LocationPicker'
-import { searchWorld, type GeoResult } from '../map/leaflet'
+import { type GeoResult } from '../map/leaflet'
+import { PlaceSearch } from '../map/PlaceSearch'
 import { useAll } from '../lib/queries'
 import { cap, splitTags } from '../lib/format'
 
@@ -113,7 +114,6 @@ export default function EntryForm() {
   const [more, setMore] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
-  const [newPlace, setNewPlace] = useState('')
   const [askChapter, setAskChapter] = useState<{ milestone: Milestone; running?: Chapter } | null>(null)
 
   // Load existing entry, or prefill a new one
@@ -181,8 +181,8 @@ export default function EntryForm() {
 
   /** Dreams create wishlist places; adventures and memories create visited ones. */
   const newPlaceStatus = type === 'dream' ? 'wishlist' : 'visited'
-  async function quickAddPlace(found?: GeoResult) {
-    const name = (found?.name ?? newPlace).trim()
+  async function quickAddPlace(found: GeoResult) {
+    const name = found.name.trim()
     if (!name) return
     // reuse an existing place with the same name rather than creating a twin
     const twin = sortedPlaces.find((p) => p.name.toLowerCase() === name.toLowerCase())
@@ -191,9 +191,11 @@ export default function EntryForm() {
       (await createEntry('place', {
         name,
         status: newPlaceStatus,
-        ...(found ? { lat: Math.round(found.lat * 1e5) / 1e5, lng: Math.round(found.lng * 1e5) / 1e5, country: found.country, region: found.region } : {}),
+        lat: Math.round(found.lat * 1e5) / 1e5,
+        lng: Math.round(found.lng * 1e5) / 1e5,
+        country: found.country,
+        region: found.region,
       }))
-    setNewPlace('')
     if (type === 'adventure') {
       const ids = (draft!.placeIds as string[]) ?? []
       if (!ids.includes(p.id)) set('placeIds', [...ids, p.id])
@@ -253,19 +255,35 @@ export default function EntryForm() {
     }
   }
 
-  const placeSelect = (k: string, label = 'Place') => (
-    <Field label={label} id={k}>
-      <select id={k} className="select" value={str(k)} onChange={(e) => set(k, e.target.value || undefined)}>
-        <option value="">None</option>
-        {sortedPlaces.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
-      <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} status={newPlaceStatus} />
-    </Field>
-  )
+  const pickNew = (r: GeoResult) => quickAddPlace(r)
+  const placeSelect = (k: string, label = 'Place') => {
+    const chosen = sortedPlaces.find((p) => p.id === str(k))
+    return (
+      <div className="field">
+        <span className="label">{label}</span>
+        {chosen ? (
+          <div className="row wrap" style={{ gap: 8 }}>
+            <span className={`place-chip ${chosen.status}`}>
+              <span className={`dot ${chosen.status}`} aria-hidden />
+              {chosen.name}
+              <button type="button" onClick={() => set(k, undefined)} aria-label={`Remove ${chosen.name}`}>
+                ×
+              </button>
+            </span>
+          </div>
+        ) : (
+          <PlaceSearch places={sortedPlaces} onPickExisting={(p) => set(k, p.id)} onPickNew={pickNew} label={`${label} — search`} />
+        )}
+        <span className="hint">
+          {chosen
+            ? chosen.status === 'wishlist'
+              ? 'On your wishlist — sea glass on the map.'
+              : 'Visited — coral on the map.'
+            : `Start typing — pick one of your places or a real place from the map. New places are saved as ${newPlaceStatus === 'wishlist' ? 'wishlist (sea glass)' : 'visited (coral)'}.`}
+        </span>
+      </div>
+    )
+  }
 
   const heading = editId ? `Edit ${ENTRY_LABEL[type].toLowerCase()}` : fromDream ? `Complete your dream` : `New ${ENTRY_LABEL[type].toLowerCase()}`
 
@@ -360,37 +378,30 @@ export default function EntryForm() {
             {(() => {
               const ids = (draft.placeIds as string[]) ?? []
               const chosen = ids.map((i) => sortedPlaces.find((p) => p.id === i)).filter(Boolean) as typeof sortedPlaces
-              const others = sortedPlaces.filter((p) => !ids.includes(p.id))
               return (
                 <>
                   {chosen.length > 0 && (
                     <div className="row wrap" style={{ gap: 8 }}>
                       {chosen.map((p) => (
-                        <button type="button" key={p.id} className="filter-chip" aria-pressed onClick={() => set('placeIds', ids.filter((i) => i !== p.id))} aria-label={`Remove ${p.name}`}>
-                          {p.name} ×
-                        </button>
+                        <span key={p.id} className={`place-chip ${p.status}`}>
+                          <span className={`dot ${p.status}`} aria-hidden />
+                          {p.name}
+                          <button type="button" onClick={() => set('placeIds', ids.filter((i) => i !== p.id))} aria-label={`Remove ${p.name}`}>
+                            ×
+                          </button>
+                        </span>
                       ))}
                     </div>
                   )}
-                  {others.length > 0 && (
-                    <select
-                      className="select"
-                      aria-label="Add one of your places"
-                      value=""
-                      onChange={(e) => {
-                        if (e.target.value) set('placeIds', [...ids, e.target.value])
-                      }}
-                    >
-                      <option value="">{chosen.length ? 'Add another of your places…' : 'Choose one of your places…'}</option>
-                      {others.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} status={newPlaceStatus} />
-                  <span className="hint">An adventure can include several places — add each stop.</span>
+                  <PlaceSearch
+                    places={sortedPlaces}
+                    exclude={ids}
+                    onPickExisting={(p) => set('placeIds', [...ids, p.id])}
+                    onPickNew={pickNew}
+                    placeholder={chosen.length ? 'Add another stop…' : 'Type a city, country or landmark…'}
+                    label="Where — search"
+                  />
+                  <span className="hint">Start typing — pick one of your places or a real place from the map. Add each stop; they turn coral on the map.</span>
                 </>
               )
             })()}
@@ -593,84 +604,5 @@ export default function EntryForm() {
         </button>
       </div>
     </main>
-  )
-}
-
-function QuickPlace({ value, onChange, onAdd, status }: { value: string; onChange: (v: string) => void; onAdd: (found?: GeoResult) => void; status: 'visited' | 'wishlist' }) {
-  const [results, setResults] = useState<GeoResult[] | null>(null)
-  const [busy, setBusy] = useState(false)
-  const [err, setErr] = useState('')
-  async function find() {
-    const q = value.trim()
-    if (!q) return
-    setBusy(true)
-    setErr('')
-    try {
-      setResults(await searchWorld(q))
-    } catch {
-      setResults(null)
-      setErr('Search needs internet — you can still add it by name and pin it later.')
-    } finally {
-      setBusy(false)
-    }
-  }
-  const done = (found?: GeoResult) => {
-    onAdd(found)
-    setResults(null)
-    setErr('')
-  }
-  return (
-    <div className="quick-place">
-      <div className="row" style={{ gap: 8 }}>
-        <input
-          className="input"
-          style={{ minHeight: 40 }}
-          value={value}
-          onChange={(e) => {
-            onChange(e.target.value)
-            setResults(null)
-          }}
-          placeholder={status === 'wishlist' ? 'Search a city, country or landmark…' : 'New place — search a city or country…'}
-          aria-label="Find a new place"
-          enterKeyHint="search"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              find()
-            }
-          }}
-        />
-        <button type="button" className="btn btn-sm btn-sea" onClick={find} disabled={!value.trim() || busy}>
-          {busy ? '…' : 'Find'}
-        </button>
-      </div>
-      {results && (
-        <div className="search-results" style={{ boxShadow: 'none', border: '1px solid var(--line)', marginTop: 8 }}>
-          {results.length === 0 && <div style={{ padding: 12 }} className="small muted">No matches.</div>}
-          {results.map((r, i) => (
-            <button type="button" key={i} onClick={() => done(r)}>
-              <b>{r.name}</b>
-              <div className="xs muted">{r.detail}</div>
-            </button>
-          ))}
-          <button type="button" onClick={() => done()}>
-            <span className="small">
-              Add “{value.trim()}” without a pin
-            </span>
-          </button>
-        </div>
-      )}
-      {err && (
-        <div className="row" style={{ marginTop: 6 }}>
-          <span className="xs muted spacer">{err}</span>
-          <button type="button" className="btn btn-sm btn-ghost" onClick={() => done()}>
-            Add by name
-          </button>
-        </div>
-      )}
-      <span className="xs muted" style={{ display: 'block', marginTop: 4 }}>
-        New places are saved as {status === 'wishlist' ? 'wishlist (sea glass on the map)' : 'visited (coral on the map)'}.
-      </span>
-    </div>
   )
 }

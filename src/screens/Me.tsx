@@ -315,7 +315,7 @@ export default function Me() {
               Everything you add is stored only in this browser on this device. There’s no account, no analytics and no tracking. Photos are never uploaded. Your location is only read if you tap “Use my location”.
             </span>
             <span style={{ display: 'block', marginTop: 8 }}>
-              Internet is used only for map backgrounds (CARTO, built on OpenStreetMap) and when you press Search on the world map (Photon / OpenStreetMap) — only the search words are sent.
+              Internet is used only for map backgrounds (CARTO, built on OpenStreetMap), when you press Search (Photon / OpenStreetMap — only the search words are sent), and once per pinned place to fetch its outline, like a city’s boundary (OpenStreetMap Nominatim — only the place’s name and pin are sent). Outlines are then kept on this device.
             </span>
             <span style={{ display: 'block', marginTop: 8 }}>
               Because data lives on this device, regular backups are your safety net. On iPhone, add ATLAS to your Home Screen so Safari keeps your data.

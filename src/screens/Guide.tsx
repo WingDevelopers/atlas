@@ -200,7 +200,7 @@ export default function Guide() {
               Countries you’ve <b>visited</b> fill with coral; countries only on your <b>wishlist</b> fill with sea glass (visited wins if both). Tap a country to see your places there.
             </p>
             <p>
-              <b>Zoom in</b> to a region and each place appears as a pin, in the same colours. Nearby pins group into a numbered circle — tap it to zoom further.
+              <b>Zoom in</b> and the countries go back to normal: now each <b>place itself</b> is coloured — its real outline, like Orlando’s city limits. Very small places show a dot until you zoom closer. A place still waiting for its outline (it’s fetched once, online) shows as a soft dashed circle.
             </p>
             <ul className="guide-list">
               <li>
@@ -210,7 +210,7 @@ export default function Guide() {
                 <b>All / Visited / Wishlist</b> filters the pins. Year and category filters appear once your places have dates or categories.
               </li>
               <li>
-                <b>Tap a country</b> for the list of places there, or <b>Zoom in</b>. <b>Tap a pin</b> for a preview → <b>View memories</b> opens the full place page.
+                <b>Tap a country</b> for the list of places there, or <b>Zoom in</b>. <b>Tap a place’s area</b> for a preview → <b>View memories</b> opens the full place page.
               </li>
               <li>
                 <b>Press and hold</b> anywhere on the map (right‑click on a computer) to add a place right there. The <b>+</b> next to search adds one too.
@@ -293,7 +293,7 @@ export default function Guide() {
               <dt>Fill in</dt>
               <dd>Name, Been there / Wishlist, and an optional pin. Search the world map, tap the map to drop a pin, or tap “Use my location”. More details: region, country, address, category, first‑visited date, notes, tags.</dd>
               <dt>Shows up</dt>
-              <dd>Map (its country fills with colour; its pin shows when you zoom in), the Places total on Home, and linked from adventures, memories and dreams.</dd>
+              <dd>Map (zoomed out its country fills with colour; zoomed in, the place’s own area does), the Places total on Home, and linked from adventures, memories and dreams.</dd>
               <dt>Its page shows</dt>
               <dd>Visit history (built from linked adventures and memories), every linked adventure, memory and dream, and “I’ve been here” for wishlist places.</dd>
             </dl>
@@ -407,7 +407,7 @@ export default function Guide() {
           </Fold>
           <Fold icon={<IconPin />} tint={T.sea} title="Move a wishlist place to visited">
             <p>
-              Open the place → <b>I’ve been here</b>. Its pin — and its country — turn coral. Then add an adventure or memory linked to it so it gets a visit date.
+              Open the place → <b>I’ve been here</b>. Its area — and its country — turn coral. Then add an adventure or memory linked to it so it gets a visit date.
             </p>
           </Fold>
           <Fold icon={<IconCamera />} tint={T.sand} title="Add photos and choose a cover">
@@ -479,7 +479,7 @@ export default function Guide() {
             <ul className="guide-list">
               <li>No account, no analytics, no tracking. Photos are never uploaded.</li>
               <li>Your location is read only when you tap “Use my location”.</li>
-              <li>Internet is used for map backgrounds and when you press Search on the world map (only your search words are sent).</li>
+              <li>Internet is used for map backgrounds, when you press Search (only your search words are sent), and once per pinned place to fetch its outline (only its name and pin are sent). After that, outlines are kept on your device.</li>
               <li>Each device and browser has its own separate atlas. Use backups to move between them.</li>
             </ul>
           </Fold>

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { L, pinIcon, TILE_OPTIONS } from '../map/leaflet'
 import { countryFills, loadCountries, type Country, type CountryFill } from '../map/countries'
+import { ensureAreas, needsArea } from '../map/areas'
 import { coverOf, placeYears, useAll, visitsFor } from '../lib/queries'
 import type { Place } from '../db/types'
 import { Cover, Loading, Segmented } from '../ui/primitives'
@@ -26,17 +27,17 @@ function useZoom() {
   return zoom
 }
 
-function CountryLayer({ fills, onSelect, selectedId }: { fills: CountryFill[]; onSelect: (f: CountryFill) => void; selectedId?: string }) {
+/** Zoomed out: whole countries are coloured. Zoomed in, they go back to normal and the places' own areas take over. */
+function CountryLayer({ fills, onSelect, selectedId, always }: { fills: CountryFill[]; onSelect: (f: CountryFill) => void; selectedId?: string; always?: boolean }) {
   const map = useMap()
-  // When zoomed in, soften the fill so towns and roads stay readable under it.
-  const close = useZoom() >= PIN_ZOOM
+  const close = useZoom() >= PIN_ZOOM && !always
   useEffect(() => {
     const layers: L.Layer[] = []
+    if (close) return
     for (const f of fills) {
       const selected = f.country.id === selectedId
-      const base = close ? 0.18 : FILL[f.status].fillOpacity
       const layer = L.geoJSON(f.country.feature, {
-        style: { ...FILL[f.status], weight: selected ? 2.5 : close ? 1.5 : 1, opacity: 0.9, fillOpacity: base + (selected ? 0.15 : 0) },
+        style: { ...FILL[f.status], className: 'atlas-country', weight: selected ? 2.5 : 1, opacity: 0.9, fillOpacity: FILL[f.status].fillOpacity + (selected ? 0.15 : 0) },
       })
       layer.on('click', (e) => {
         L.DomEvent.stopPropagation(e)
@@ -51,10 +52,60 @@ function CountryLayer({ fills, onSelect, selectedId }: { fills: CountryFill[]; o
   return null
 }
 
-function PinsWhenClose({ places, onSelect, always }: { places: Place[]; onSelect: (p: Place) => void; always: boolean }) {
+/** Radius used when a place has no outline yet (offline, or OpenStreetMap had none). */
+const FALLBACK_RADIUS_M = 5000
+
+/**
+ * Zoomed in: each place is drawn as its own area — the real outline when we
+ * have it (e.g. Orlando's city limits), otherwise a soft circle around the pin.
+ * Areas too small to see at the current zoom get a dot so they stay tappable.
+ */
+function PlaceAreas({ places, onSelect, selectedId }: { places: Place[]; onSelect: (p: Place) => void; selectedId?: string }) {
+  const map = useMap()
   const zoom = useZoom()
-  if (!always && zoom < PIN_ZOOM) return null
-  return <ClusterLayer places={places} onSelect={onSelect} />
+  const close = zoom >= PIN_ZOOM
+  useEffect(() => {
+    if (!close) return
+    const layers: L.Layer[] = []
+    for (const p of places) {
+      const selected = p.id === selectedId
+      const style = {
+        ...FILL[p.status],
+        className: `atlas-area ${p.status}`,
+        weight: selected ? 3 : 1.5,
+        opacity: 0.95,
+        fillOpacity: selected ? 0.6 : 0.45,
+      }
+      const area = p.area && p.area.forLat === p.lat && p.area.forLng === p.lng ? p.area : undefined
+      const shape: L.Layer & { getBounds(): L.LatLngBounds } = area
+        ? L.geoJSON(area.geometry as never, { style })
+        : L.circle([p.lat!, p.lng!], { radius: FALLBACK_RADIUS_M, ...style, dashArray: '4 4' })
+      const tip = area && area.name && area.name !== p.name ? `${p.name} · ${area.name}` : p.name
+      shape.on('click', (e) => {
+        L.DomEvent.stopPropagation(e as L.LeafletEvent)
+        onSelect(p)
+      })
+      ;(shape as unknown as L.Path).bindTooltip?.(tip, { sticky: true, direction: 'top', className: 'atlas-tip' })
+      shape.addTo(map)
+      layers.push(shape)
+      // keep tiny areas visible and tappable
+      const b = shape.getBounds()
+      const sw = map.latLngToLayerPoint(b.getSouthWest())
+      const ne = map.latLngToLayerPoint(b.getNorthEast())
+      if (Math.max(Math.abs(ne.x - sw.x), Math.abs(sw.y - ne.y)) < 16) {
+        const dot = L.circleMarker([p.lat!, p.lng!], { radius: 7, color: '#fffdf8', weight: 2, fillColor: FILL[p.status].fillColor, fillOpacity: 1, className: `atlas-dot ${p.status}` })
+        dot.on('click', (e) => {
+          L.DomEvent.stopPropagation(e)
+          onSelect(p)
+        })
+        dot.bindTooltip(p.name, { direction: 'top', className: 'atlas-tip' })
+        dot.addTo(map)
+        layers.push(dot)
+      }
+    }
+    return () => layers.forEach((l) => map.removeLayer(l))
+  }, [map, places, onSelect, selectedId, close, zoom])
+  return null
 }
 
 /** Zoom to a country's saved places (so their pins show), or to the country itself. */
@@ -178,6 +229,14 @@ export default function MapScreen() {
     return data.places.filter((p) => [p.name, p.region, p.country, p.address, ...p.tags].some((f) => f?.toLowerCase().includes(t))).slice(0, 8)
   }, [q, data])
 
+  // Fetch outlines for pinned places that don't have one yet (online only, queued politely).
+  const needOutline = useMemo(() => located.filter((p) => needsArea(p)).map((p) => p.id).join(','), [located])
+  useEffect(() => {
+    if (!needOutline) return
+    ensureAreas(located.filter((p) => needsArea(p))).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needOutline])
+
   const focus = useMemo(() => data?.places.find((p) => p.id === focusId), [data, focusId])
   useEffect(() => {
     if (focus) setSelected(focus)
@@ -192,7 +251,8 @@ export default function MapScreen() {
       <MapContainer center={[20, 0]} zoom={2} minZoom={1} worldCopyJump zoomControl={false} style={{ height: '100%' }}>
         <TileLayer {...TILE_OPTIONS} />
         <CountryLayer fills={fills} onSelect={selectCountry} selectedId={selCountry?.country.id} />
-        <PinsWhenClose places={visible} onSelect={setSelected} always={!countries?.length} />
+        <PlaceAreas places={visible} onSelect={setSelected} selectedId={selected?.id} />
+        {countries && countries.length === 0 && <ClusterLayer places={visible} onSelect={setSelected} />}
         <ZoomToCountry target={zoomTarget} />
         <FitTo places={visible} focus={focus} />
         <LongPressToAdd />
