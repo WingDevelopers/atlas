@@ -2140,3 +2140,12 @@ button.card:active {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* keep side-by-side fields (e.g. two dates) inside the screen on narrow phones */
+.field-row > * {
+  min-width: 0;
+}
+.field-row .input {
+  min-width: 0;
+  max-width: 100%;
+}

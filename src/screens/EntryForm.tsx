@@ -354,6 +354,50 @@ export default function EntryForm() {
           </>
         )}
 
+        {type === 'adventure' && (
+          <div className="field">
+            <span className="label">Where? (optional)</span>
+            {(() => {
+              const ids = (draft.placeIds as string[]) ?? []
+              const chosen = ids.map((i) => sortedPlaces.find((p) => p.id === i)).filter(Boolean) as typeof sortedPlaces
+              const others = sortedPlaces.filter((p) => !ids.includes(p.id))
+              return (
+                <>
+                  {chosen.length > 0 && (
+                    <div className="row wrap" style={{ gap: 8 }}>
+                      {chosen.map((p) => (
+                        <button type="button" key={p.id} className="filter-chip" aria-pressed onClick={() => set('placeIds', ids.filter((i) => i !== p.id))} aria-label={`Remove ${p.name}`}>
+                          {p.name} ×
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {others.length > 0 && (
+                    <select
+                      className="select"
+                      aria-label="Add one of your places"
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value) set('placeIds', [...ids, e.target.value])
+                      }}
+                    >
+                      <option value="">{chosen.length ? 'Add another of your places…' : 'Choose one of your places…'}</option>
+                      {others.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} status={newPlaceStatus} />
+                  <span className="hint">An adventure can include several places — add each stop.</span>
+                </>
+              )
+            })()}
+          </div>
+        )}
+        {type === 'memory' && placeSelect('placeId', 'Where? (optional)')}
+
         <PhotoField state={photos} onChange={setPhotos} />
 
         {/* ---------- optional details ---------- */}
@@ -365,22 +409,6 @@ export default function EntryForm() {
           <>
             {type === 'adventure' && (
               <>
-                <div className="field">
-                  <span className="label">Places</span>
-                  <div className="row wrap" style={{ gap: 8 }}>
-                    {sortedPlaces.length === 0 && <span className="xs muted">No places yet — add one below.</span>}
-                    {sortedPlaces.map((p) => {
-                      const ids = (draft.placeIds as string[]) ?? []
-                      const on = ids.includes(p.id)
-                      return (
-                        <button type="button" key={p.id} className="filter-chip" aria-pressed={on} onClick={() => set('placeIds', on ? ids.filter((i) => i !== p.id) : [...ids, p.id])}>
-                          {p.name}
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <QuickPlace value={newPlace} onChange={setNewPlace} onAdd={quickAddPlace} status={newPlaceStatus} />
-                </div>
                 <Field label="The story" id="story">
                   <textarea id="story" className="textarea" value={str('story')} onChange={(e) => set('story', e.target.value)} placeholder="How did it feel? What surprised you?" />
                 </Field>
@@ -400,7 +428,6 @@ export default function EntryForm() {
                 <Field label="The story" id="story">
                   <textarea id="story" className="textarea" value={str('story')} onChange={(e) => set('story', e.target.value)} />
                 </Field>
-                {placeSelect('placeId')}
                 <Field label="Part of an adventure" id="adventureId">
                   <select id="adventureId" className="select" value={str('adventureId')} onChange={(e) => set('adventureId', e.target.value || undefined)}>
                     <option value="">None</option>

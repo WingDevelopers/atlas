@@ -268,7 +268,7 @@ export default function Guide() {
           <Fold icon={<IconBook />} tint={T.coral} title="Adventure" sub="A trip or outing — one place or many">
             <dl className="guide-dl">
               <dt>Fill in</dt>
-              <dd>Title, start date (end date optional), photos. More details: places, the story, “What I’ll remember” (a single line or quote), who was there, tags.</dd>
+              <dd>Title, start date (end date optional), <b>Where?</b> (one or several places — pick yours or search a city or country), photos. More details: the story, “What I’ll remember” (a single line or quote), who was there, tags.</dd>
               <dt>Shows up</dt>
               <dd>Home hero (if it’s your latest), Postcards, Archive, and on the page of every place it’s linked to.</dd>
               <dt>Connects to</dt>
@@ -280,7 +280,7 @@ export default function Guide() {
           <Fold icon={<IconSparkle />} tint={T.sea} title="Memory" sub="One moment worth keeping">
             <dl className="guide-dl">
               <dt>Fill in</dt>
-              <dd>Title, optional date and time, photos. More details: the story, place, the adventure it belongs to, people, tags, favourite ♥.</dd>
+              <dd>Title, optional date, <b>Where?</b>, photos. More details: time, the story, the adventure it belongs to, people, tags, favourite ♥.</dd>
               <dt>Shows up</dt>
               <dd>Postcards on Home, Archive (and the Favourites filter), its place’s page and its adventure’s page.</dd>
               <dt>Connects to</dt>
@@ -353,7 +353,7 @@ export default function Guide() {
                   <b>+ → Adventure.</b> Title (“Spring in Lisbon”) and dates.
                 </>,
                 <>
-                  <b>More details → Places:</b> tap existing places, or type new ones under “New place name…”.
+                  <b>Where?</b> — choose your places, or type a city or country and tap <b>Find</b>. Add each stop.
                 </>,
                 <>Add the story, a “What I’ll remember” line and your best photos. Save.</>,
                 <>
