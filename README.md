@@ -51,7 +51,7 @@ npm run e2e        # clicks through the whole app at iPhone size (needs Playwrig
 | --- | --- | --- |
 | App | React + TypeScript + Vite | Widely supported, fast, easy for Claude to maintain |
 | Local database | IndexedDB via Dexie | Works offline, stores photos, has versioned schema migrations |
-| Map | Leaflet + CARTO Voyager tiles (free key, restricted to fernandovindas21.github.io; set in src/map/leaflet.ts) + filled countries (Natural Earth via world-atlas) + marker clustering | Light editorial style; falls back to OpenStreetMap if the key is removed |
+| Map | Leaflet + CARTO Voyager tiles (free key, restricted to wingdevelopers.github.io; set in src/map/leaflet.ts) + filled countries (Natural Earth via world-atlas) + marker clustering | Light editorial style; falls back to OpenStreetMap if the key is removed |
 | World search | Photon (OpenStreetMap), only when you press Search | No key; only search words are sent |
 | Offline | Service worker (vite-plugin-pwa) | App works with no connection; viewed map tiles are cached |
 | Fonts | Inter (UI) + Fraunces (editorial headings), bundled | No external font requests |
