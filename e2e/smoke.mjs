@@ -33,6 +33,12 @@ await page.route(/nominatim\.openstreetmap\.org/, (r) => {
   const d = 0.08
   return r.fulfill({ json: { type: 'FeatureCollection', features: [{ type: 'Feature', properties: { name: u.searchParams.get('q') ?? 'Town', addresstype: 'city' }, geometry: { type: 'Polygon', coordinates: [[[lng - d, lat - d], [lng + d, lat - d], [lng + d, lat + d], [lng - d, lat + d], [lng - d, lat - d]]] } }] } })
 })
+// Dates relative to today, so the test works on any day
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const TODAY = new Date()
+const TOMORROW = new Date(TODAY.getTime() + 86400000)
+const TODAY_LABEL = `${TODAY.getDate()} ${MONTHS[TODAY.getMonth()]} ${TODAY.getFullYear()}`
 const shot = (n) => page.screenshot({ path: `${OUT}/${n}.png` })
 
 await page.goto(BASE)
@@ -177,7 +183,7 @@ await page.locator('#title').fill('Hike Patagonia')
 await page.getByLabel('Where? (optional) — search').fill('Torres del Paine')
 await page.getByRole('option', { name: /Torres del Paine/ }).first().click()
 await page.getByRole('button', { name: 'Remove Torres del Paine' }).waitFor()
-await page.getByText('On your wishlist — sea glass on the map.').waitFor()
+await page.getByText('On your wishlist — turquoise on the map.').waitFor()
 await shot('06b-dream-where')
 await page.getByRole('button', { name: 'Save' }).click()
 await page.getByRole('heading', { name: 'Hike Patagonia' }).waitFor()
@@ -249,7 +255,7 @@ await page.getByRole('link', { name: /The ATLAS era/ }).waitFor()
 // New milestone (tomorrow) → open a new chapter; the running one closes the day before
 await page.goto(BASE + '#/new/milestone')
 await page.locator('#title').fill('Moved to Porto')
-await page.locator('#date').fill('2026-10-29')
+await page.locator('#date').fill(iso(TOMORROW))
 await page.getByRole('button', { name: 'Save' }).click()
 await page.getByRole('button', { name: 'Open a new chapter' }).click()
 await page.getByText(/ends the day before/).waitFor()
@@ -257,7 +263,7 @@ await page.locator('#title').fill('The Porto chapter')
 await page.getByRole('button', { name: 'Save chapter' }).click()
 await page.getByRole('heading', { name: 'The Porto chapter' }).waitFor()
 await page.goto(BASE + '#/archive?view=chapters')
-await page.getByText(/28 Oct 2026/).first().waitFor()
+await page.getByText(TODAY_LABEL).first().waitFor()
 if (await page.getByText('Got a plant').count()) throw new Error('“keep going” milestone should not be suggested again')
 await shot('09d-chapters-list')
 await page.goto(BASE + '#/archive')
@@ -286,8 +292,8 @@ const nFills = await fills.count()
 if (nFills !== 3) throw new Error(`expected 3 filled countries, got ${nFills}`)
 if (await page.locator('.atlas-pin').count()) throw new Error('pins should be hidden when zoomed out')
 const colours = await fills.evaluateAll((els) => els.map((e) => e.getAttribute('fill')).sort())
-if (colours.join() !== '#78AEB0,#78AEB0,#D77C66') throw new Error('unexpected fill colours ' + colours)
-// Porto is on the wishlist inside coral Portugal → shown as a sea-glass dot
+if (colours.join() !== '#37B9B0,#37B9B0,#FF775E') throw new Error('unexpected fill colours ' + colours)
+// Porto is on the wishlist inside coral Portugal → shown as a turquoise dot
 if ((await page.locator('.map-page path.atlas-dot.wishlist').count()) !== 1) throw new Error('wishlist dot inside visited country missing')
 await shot('10a-map-countries')
 await page.getByRole('button', { name: 'Wishlist' }).click()
@@ -296,7 +302,7 @@ if ((await fills.count()) !== 3) throw new Error('wishlist filter failed') // Ja
 await page.getByRole('button', { name: 'All' }).click()
 await page.waitForTimeout(300)
 // Tap Portugal → country card → zoom in → pins appear
-await page.locator('.map-page path.leaflet-interactive[fill="#D77C66"]').dispatchEvent('click')
+await page.locator('.map-page path.leaflet-interactive[fill="#FF775E"]').dispatchEvent('click')
 await page.getByRole('dialog', { name: 'Portugal' }).waitFor()
 await shot('10b-map-country-card')
 await page.getByRole('button', { name: 'Zoom in' }).click()

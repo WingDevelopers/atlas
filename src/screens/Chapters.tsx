@@ -562,7 +562,7 @@ function EntryPicker({ data, selected, onDone }: { data: AllData; selected: Set<
           )
         })}
       </ul>
-      <div className="row" style={{ position: 'sticky', bottom: 0, background: 'var(--ivory)', paddingTop: 12 }}>
+      <div className="row" style={{ position: 'sticky', bottom: 0, background: 'var(--cream)', paddingTop: 12 }}>
         <span className="small muted spacer">{sel.size} selected</span>
         <button
           className="btn btn-primary"

@@ -62,16 +62,17 @@ src/
              dream completion) · media.ts (photos) · backup.ts (export/import) · demo.ts
   screens/   Home, MapScreen, Dreams, Archive, Me, EntryForm, details, Welcome
   ui/        design primitives, icons, illustrations
-  styles/    tokens.css (Modern Wanderlust design tokens) · app.css
+  styles/    tokens.css (Sunlit Wanderlust design tokens) · app.css
   map/       Leaflet setup, location picker
 e2e/         browser smoke test
 ```
 
-### Design tokens (Modern Wanderlust — locked)
+### Design tokens (Sunlit Wanderlust — locked)
 
-Ivory `#F5F0E6` · Sunshine `#E7B75F` · Coral `#D77C66` · Sea Glass `#78AEB0` · Charcoal `#414D45`,
-with sand/sage used sparingly. For readable text, coral text uses `#B0533C` and primary buttons use
-`#B85C45` (same hue, deeper, so white text passes accessibility contrast).
+Cream `#FFF9ED` · Sunshine `#FFC857` · Coral `#FF775E` · Turquoise `#37B9B0` · Forest `#275C55`.
+Backgrounds stay light; saturated colours are for accents. For accessible contrast, text and icons
+on coral and turquoise fills use deep forest `#173A35`, text on sunshine uses forest, and coloured
+text uses deeper inks: coral `#B23A22`, turquoise `#1A6E67`, sunshine `#8A5A00`.
 
 ### Data rules
 

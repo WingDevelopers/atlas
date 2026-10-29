@@ -47,20 +47,20 @@ export function CurrentTrip({ trip, data }: { trip: Adventure; data: AllData }) 
 
       <div className="trip-actions" role="group" aria-label="Quick add to this adventure">
         <Link to={`/new/memory?adventure=${trip.id}${lastStop ? `&place=${lastStop.id}` : ''}`} className="trip-action">
-          <span className="ic" style={{ background: 'var(--sea-tint)', color: '#2d5c5e' }}>
+          <span className="ic" style={{ background: 'var(--turquoise-tint)', color: 'var(--turquoise-ink)' }}>
             <IconSparkle />
           </span>
           Add a moment
           {momentsToday > 0 && <span className="xs muted">{momentsToday} today</span>}
         </Link>
         <button type="button" className="trip-action" onClick={() => photoInput.current?.click()} disabled={busy}>
-          <span className="ic" style={{ background: 'var(--coral-tint)', color: '#8d3f2c' }}>
+          <span className="ic" style={{ background: 'var(--coral-tint)', color: 'var(--coral-ink)' }}>
             <IconCamera />
           </span>
           {busy ? 'Adding…' : 'Add photos'}
         </button>
         <button type="button" className="trip-action" onClick={() => setNextStop(true)}>
-          <span className="ic" style={{ background: 'var(--sun-tint)', color: '#7a5517' }}>
+          <span className="ic" style={{ background: 'var(--sun-tint)', color: 'var(--sun-ink)' }}>
             <IconPin />
           </span>
           Current stop
@@ -81,7 +81,7 @@ export function CurrentTrip({ trip, data }: { trip: Adventure; data: AllData }) 
             toast({ message: 'Welcome home. Your adventure is in the Archive.' })
           }}
         >
-          <span className="ic" style={{ background: 'var(--sage-tint)', color: '#45533a' }}>
+          <span className="ic" style={{ background: 'var(--forest-tint)', color: 'var(--forest)' }}>
             <IconCheck />
           </span>
           I’m home

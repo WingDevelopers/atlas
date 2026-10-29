@@ -1,36 +1,40 @@
 /* ==========================================================================
-   MODERN WANDERLUST — design tokens
-   80% clean travel editorial · 20% sun-faded postcard
+   SUNLIT WANDERLUST — design tokens
+   Clean, photo-first travel editorial · the first day of summer
    ========================================================================== */
 
 :root {
   /* Brand palette (locked) */
-  --ivory: #f5f0e6;      /* primary background */
-  --sunshine: #e7b75f;   /* warm highlight */
-  --coral: #d77c66;      /* primary accent */
-  --sea-glass: #78aeb0;  /* secondary accent */
-  --charcoal: #414d45;   /* primary text */
+  --cream: #fff9ed;      /* main background */
+  --sunshine: #ffc857;   /* joyful highlights */
+  --coral: #ff775e;      /* primary calls to action */
+  --turquoise: #37b9b0;  /* map, travel accents, secondary actions */
+  --forest: #275c55;     /* headings, navigation, contrast */
 
   /* Supporting tones, used sparingly */
-  --sand: #e9dfcc;
-  --sand-soft: #efe7d8;
-  --sage: #b7c2a9;
-  --paper: #fbf8f2;      /* card surface, a touch lighter than ivory */
+  --sand: #f9ebcf;
+  --sand-soft: #fff1d9;
+  --paper: #fffdf8;      /* card surface, a touch lighter than cream */
+  --forest-deep: #173a35;
 
-  /* Accessible derivatives (pass WCAG AA on ivory/paper) */
-  --coral-ink: #b0533c;  /* coral for text & links */
-  --coral-deep: #b85c45; /* primary button fill — white text passes AA */
-  --sea-ink: #356c6e;
-  --text: var(--charcoal);
-  --text-muted: #5c665f;
-  --line: rgba(65, 77, 69, 0.12);
-  --line-strong: rgba(65, 77, 69, 0.22);
+  /* Accessible derivatives (WCAG AA on cream, paper and their tints) */
+  --on-coral: var(--forest-deep);  /* text & icons on coral fills (4.8:1) */
+  --on-sunshine: var(--forest);    /* text on sunshine fills (5:1) */
+  --on-turquoise: var(--forest-deep);
+  --coral-hover: #ff8b73;
+  --coral-ink: #b23a22;      /* coral for text & links */
+  --turquoise-ink: #1a6e67;  /* turquoise for text */
+  --sun-ink: #8a5a00;        /* sunshine for text */
+  --text: var(--forest);
+  --text-muted: #4b6a65;
+  --line: rgba(39, 92, 85, 0.12);
+  --line-strong: rgba(39, 92, 85, 0.22);
 
   /* Tints */
-  --coral-tint: #f3dcd3;
-  --sea-tint: #d9e9e8;
-  --sun-tint: #f6e7c6;
-  --sage-tint: #e3e8db;
+  --coral-tint: #ffe3db;
+  --turquoise-tint: #d7f2ef;
+  --sun-tint: #ffefc7;
+  --forest-tint: #ddefe9;
 
   /* Typography */
   --font-ui: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;

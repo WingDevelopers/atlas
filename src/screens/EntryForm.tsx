@@ -288,9 +288,9 @@ export default function EntryForm() {
         <span className="hint">
           {chosen
             ? chosen.status === 'wishlist'
-              ? 'On your wishlist — sea glass on the map.'
+              ? 'On your wishlist — turquoise on the map.'
               : 'Visited — coral on the map.'
-            : `Start typing — pick one of your places or a real place from the map. New places are saved as ${newPlaceStatus === 'wishlist' ? 'wishlist (sea glass)' : 'visited (coral)'}.`}
+            : `Start typing — pick one of your places or a real place from the map. New places are saved as ${newPlaceStatus === 'wishlist' ? 'wishlist (turquoise)' : 'visited (coral)'}.`}
         </span>
       </div>
     )

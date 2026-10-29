@@ -74,7 +74,7 @@ export function PlaceSearch({
 
   return (
     <div className="place-search">
-      <div className="searchbar" style={{ boxShadow: 'none', border: '1px solid var(--line-strong)', background: '#fffdf9' }}>
+      <div className="searchbar" style={{ boxShadow: 'none', border: '1px solid var(--line-strong)', background: 'var(--paper)' }}>
         <IconSearch />
         <input
           value={q}

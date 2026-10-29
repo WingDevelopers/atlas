@@ -76,9 +76,9 @@ function Try({ to, children }: { to: string; children: ReactNode }) {
 
 const T = {
   coral: 'var(--coral-tint)',
-  sea: 'var(--sea-tint)',
+  turquoise: 'var(--turquoise-tint)',
   sun: 'var(--sun-tint)',
-  sage: 'var(--sage-tint)',
+  forest: 'var(--forest-tint)',
   sand: 'var(--sand-soft)',
 }
 
@@ -98,7 +98,7 @@ function Diagram() {
       </text>
     </g>
   )
-  const line = (d: string, dashed = false) => <path d={d} fill="none" stroke="#414D45" strokeOpacity=".45" strokeWidth={1.6} strokeDasharray={dashed ? '5 5' : undefined} markerEnd="url(#arrow)" />
+  const line = (d: string, dashed = false) => <path d={d} fill="none" stroke="#275C55" strokeOpacity=".45" strokeWidth={1.6} strokeDasharray={dashed ? '5 5' : undefined} markerEnd="url(#arrow)" />
   const tag = (x: number, y: number, t: string) => (
     <text x={x} y={y} textAnchor="middle" className="dg-tag">
       {t}
@@ -113,7 +113,7 @@ function Diagram() {
         </desc>
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0 0 L10 5 L0 10z" fill="#414D45" fillOpacity=".55" />
+            <path d="M0 0 L10 5 L0 10z" fill="#275C55" fillOpacity=".55" />
           </marker>
         </defs>
         {/* links */}
@@ -128,11 +128,11 @@ function Diagram() {
         {line('M70 240 L70 98', true)}
         {tag(36, 166, 'becomes')}
         {/* nodes */}
-        {node(70, 68, 104, 'Adventure', 'a trip or outing', '#F3DCD3', '#D77C66')}
-        {node(286, 68, 108, 'Memory', 'one moment', '#D9E9E8', '#78AEB0')}
-        {node(180, 168, 104, 'Place', 'a pin on the map', '#F6E7C6', '#E7B75F')}
-        {node(70, 268, 104, 'Dream', 'not done… yet', '#E3E8DB', '#8FA08A')}
-        {node(282, 268, 112, 'Milestone', 'a life moment', '#EFE7D8', '#B9A98A')}
+        {node(70, 68, 104, 'Adventure', 'a trip or outing', '#FFE3DB', '#FF775E')}
+        {node(286, 68, 108, 'Memory', 'one moment', '#D7F2EF', '#37B9B0')}
+        {node(180, 168, 104, 'Place', 'a pin on the map', '#FFEFC7', '#FFC857')}
+        {node(70, 268, 104, 'Dream', 'not done… yet', '#DDEFE9', '#275C55')}
+        {node(282, 268, 112, 'Milestone', 'a life moment', '#FFF1D9', '#E9A93A')}
         {tag(282, 312, 'no place needed')}
       </svg>
       <figcaption className="xs muted">Solid lines are links you set. Dashed lines are optional or happen when a dream comes true.</figcaption>
@@ -197,7 +197,7 @@ export default function Guide() {
           </Fold>
           <Fold icon={<IconMap />} tint={T.sun} title="Map" sub="Every place with a pin">
             <p>
-              Countries you’ve <b>visited</b> fill with coral; countries only on your <b>wishlist</b> fill with sea glass (visited wins if both). Tap a country to see your places there.
+              Countries you’ve <b>visited</b> fill with coral; countries only on your <b>wishlist</b> fill with turquoise (visited wins if both). Tap a country to see your places there.
             </p>
             <p>
               <b>Zoom in</b> and the countries go back to normal: now each <b>place itself</b> is coloured — its real outline, like Orlando’s city limits. Very small places show a dot until you zoom closer. A place still waiting for its outline (it’s fetched once, online) shows as a soft dashed circle.
@@ -218,12 +218,12 @@ export default function Guide() {
             </ul>
             <p className="xs muted">A place colours its country from its pin — or, if it has no pin, from its Country field. Without either, it simply doesn’t appear on the map.</p>
           </Fold>
-          <Fold icon={<IconDreams />} tint={T.sage} title="Dreams" sub="Things you haven’t done. Yet.">
+          <Fold icon={<IconDreams />} tint={T.forest} title="Dreams" sub="Things you haven’t done. Yet.">
             <p>
               Your bucket list. Filter by status: <b>Someday → Planning → Booked → Completed</b>. “Still dreaming” shows everything not yet done. Open a dream to change its status with one tap, or press <b>I did it</b>.
             </p>
           </Fold>
-          <Fold icon={<IconArchive />} tint={T.sea} title="Archive" sub="Your timeline, year by year — and your chapters">
+          <Fold icon={<IconArchive />} tint={T.turquoise} title="Archive" sub="Your timeline, year by year — and your chapters">
             <p>
               <b>Timeline</b> shows adventures, memories and milestones in date order, newest first, grouped by year. Entries without a date sit at the end under “Undated”. Use the search box (it looks inside titles, stories, people and tags) and the filters: Adventures, Memories, Milestones or Favourites.
             </p>
@@ -277,7 +277,7 @@ export default function Guide() {
             <p className="xs muted">On an adventure’s page, “Add a memory to this adventure” links the new memory automatically.</p>
             <Try to="/new/adventure">Try: new adventure</Try>
           </Fold>
-          <Fold icon={<IconSparkle />} tint={T.sea} title="Memory" sub="One moment worth keeping">
+          <Fold icon={<IconSparkle />} tint={T.turquoise} title="Memory" sub="One moment worth keeping">
             <dl className="guide-dl">
               <dt>Fill in</dt>
               <dd>Title, optional date, <b>Where?</b>, photos. More details: time, the story, the adventure it belongs to, people, tags, favourite ♥.</dd>
@@ -300,15 +300,15 @@ export default function Guide() {
             <p className="xs muted">Tip: while writing an adventure, memory or dream, type a name under “New place name…” to create a place on the spot. Add its pin later.</p>
             <Try to="/new/place">Try: new place</Try>
           </Fold>
-          <Fold icon={<IconDreams />} tint={T.sage} title="Dream" sub="A destination, experience, skill — anything">
+          <Fold icon={<IconDreams />} tint={T.forest} title="Dream" sub="A destination, experience, skill — anything">
             <dl className="guide-dl">
               <dt>Fill in</dt>
               <dd>Title, kind (destination, experience, skill, other), status, photos, and — for destinations — <b>Where?</b>: pick one of your places or search a city, country or landmark. More details: why it matters, budget estimate, with whom, inspiration links, notes and planning, tags.</dd>
               <dt>Shows up</dt>
-              <dd>Dreams tab, “Next, maybe?” on Home, its place’s page — and the map: a place found from a dream is saved to your wishlist, so its country turns sea glass. Tap that country and the dream is listed.</dd>
+              <dd>Dreams tab, “Next, maybe?” on Home, its place’s page — and the map: a place found from a dream is saved to your wishlist, so its country turns turquoise. Tap that country and the dream is listed.</dd>
               <dt>When it comes true</dt>
               <dd>
-                Press <b>I did it</b> → create an adventure, create a memory, or just mark it complete. The dream stays in your list as Completed, linked to what you created, and its place turns from wishlist to visited — sea glass becomes coral.
+                Press <b>I did it</b> → create an adventure, create a memory, or just mark it complete. The dream stays in your list as Completed, linked to what you created, and its place turns from wishlist to visited — turquoise becomes coral.
               </dd>
             </dl>
             <Try to="/new/dream">Try: new dream</Try>
@@ -384,7 +384,7 @@ export default function Guide() {
                 </>,
                 <>Or search: type a city, park or address and pick a result. Search needs internet and only sends the words you typed.</>,
                 <>
-                  Choose <b>Been there</b> or <b>Wishlist</b>. Save — its country fills with coral or sea glass.
+                  Choose <b>Been there</b> or <b>Wishlist</b>. Save — its country fills with coral or turquoise.
                 </>,
                 <>
                   Already have a place without a pin? Open it → <b>Add a pin</b>.
@@ -392,7 +392,7 @@ export default function Guide() {
               ]}
             />
           </Fold>
-          <Fold icon={<IconDreams />} tint={T.sage} title="Turn a dream into an adventure">
+          <Fold icon={<IconDreams />} tint={T.forest} title="Turn a dream into an adventure">
             <Steps
               items={[
                 <>Open the dream. Move its status along as plans firm up: Someday → Planning → Booked.</>,
@@ -405,7 +405,7 @@ export default function Guide() {
             />
             <p className="xs muted">Marked it complete without writing it up? Open the dream — you can still create the adventure or memory later.</p>
           </Fold>
-          <Fold icon={<IconPin />} tint={T.sea} title="Move a wishlist place to visited">
+          <Fold icon={<IconPin />} tint={T.turquoise} title="Move a wishlist place to visited">
             <p>
               Open the place → <b>I’ve been here</b>. Its area — and its country — turn coral. Then add an adventure or memory linked to it so it gets a visit date.
             </p>
@@ -443,7 +443,7 @@ export default function Guide() {
             />
             <p className="xs muted">Chapters can overlap — “Living abroad” and “Learning to cook” can share the same years.</p>
           </Fold>
-          <Fold icon={<IconArchive />} tint={T.sea} title="Find something">
+          <Fold icon={<IconArchive />} tint={T.turquoise} title="Find something">
             <p>
               <b>Archive search</b> looks through titles, stories, people, companions and tags. <b>Map search</b> looks through place names, regions, countries and tags.
             </p>
@@ -464,7 +464,7 @@ export default function Guide() {
               Creates one <b>.zip</b> file with every entry and every original photo, checked before it’s handed to you. On iPhone, choose <b>Save to Files</b> and keep it in iCloud Drive or another safe place. A good rhythm: after each trip, or once a month.
             </p>
           </Fold>
-          <Fold icon={<IconDownload />} tint={T.sea} title="Restore or move to a new phone" sub="Me → Restore from a backup">
+          <Fold icon={<IconDownload />} tint={T.turquoise} title="Restore or move to a new phone" sub="Me → Restore from a backup">
             <p>ATLAS checks the whole file first and changes nothing if anything is damaged. Then choose:</p>
             <ul className="guide-list">
               <li>
@@ -475,7 +475,7 @@ export default function Guide() {
               </li>
             </ul>
           </Fold>
-          <Fold icon={<IconShield />} tint={T.sage} title="Privacy, in plain words">
+          <Fold icon={<IconShield />} tint={T.forest} title="Privacy, in plain words">
             <ul className="guide-list">
               <li>No account, no analytics, no tracking. Photos are never uploaded.</li>
               <li>Your location is read only when you tap “Use my location”.</li>

@@ -465,7 +465,7 @@ export function DreamDetail() {
           {!place ? (
             <div className="note">
               No place yet.{' '}
-              <Link to={`/edit/dream/${d.id}`}>Add where</Link> and it appears on your map in sea glass.
+              <Link to={`/edit/dream/${d.id}`}>Add where</Link> and it appears on your map in turquoise.
             </div>
           ) : place.lat === undefined && !place.country ? (
             <div className="note warn">
@@ -487,7 +487,7 @@ export function DreamDetail() {
               <button className="link-btn" onClick={() => updateEntry('place', place.id, { status: 'wishlist', visitedOn: undefined })}>
                 mark {place.name} as not visited yet
               </button>{' '}
-              and it turns sea glass.
+              and it turns turquoise.
             </div>
           )}
         </section>

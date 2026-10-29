@@ -17,8 +17,8 @@ type StatusFilter = 'all' | 'visited' | 'wishlist'
 const PIN_ZOOM = 5
 
 const FILL = {
-  visited: { fillColor: '#D77C66', color: '#B85C45', fillOpacity: 0.5 },
-  wishlist: { fillColor: '#78AEB0', color: '#4F8C8E', fillOpacity: 0.42 },
+  visited: { fillColor: '#FF775E', color: '#E8573C', fillOpacity: 0.5 },
+  wishlist: { fillColor: '#37B9B0', color: '#23968E', fillOpacity: 0.42 },
 }
 
 function useZoom() {
@@ -55,7 +55,7 @@ function CountryLayer({ fills, onSelect, selectedId, always }: { fills: CountryF
 
 /**
  * Zoomed out, a wishlist place inside a country you've already visited would be
- * hidden under the coral. Show it as a sea-glass dot so dreams stay visible.
+ * hidden under the coral. Show it as a turquoise dot so dreams stay visible.
  */
 function WishlistDots({ fills, onSelect }: { fills: CountryFill[]; onSelect: (p: Place) => void }) {
   const map = useMap()
@@ -67,7 +67,7 @@ function WishlistDots({ fills, onSelect }: { fills: CountryFill[]; onSelect: (p:
       if (f.status !== 'visited') continue
       for (const p of f.places) {
         if (p.status !== 'wishlist' || typeof p.lat !== 'number' || typeof p.lng !== 'number') continue
-        const dot = L.circleMarker([p.lat, p.lng], { radius: 6, color: '#fffdf8', weight: 2, fillColor: '#78AEB0', fillOpacity: 1, className: 'atlas-dot wishlist' })
+        const dot = L.circleMarker([p.lat, p.lng], { radius: 6, color: '#FFFDF8', weight: 2, fillColor: '#37B9B0', fillOpacity: 1, className: 'atlas-dot wishlist' })
         dot.on('click', (e) => {
           L.DomEvent.stopPropagation(e)
           onSelect(p)
@@ -123,7 +123,7 @@ function PlaceAreas({ places, onSelect, selectedId }: { places: Place[]; onSelec
       const sw = map.latLngToLayerPoint(b.getSouthWest())
       const ne = map.latLngToLayerPoint(b.getNorthEast())
       if (Math.max(Math.abs(ne.x - sw.x), Math.abs(sw.y - ne.y)) < 16) {
-        const dot = L.circleMarker([p.lat!, p.lng!], { radius: 7, color: '#fffdf8', weight: 2, fillColor: FILL[p.status].fillColor, fillOpacity: 1, className: `atlas-dot ${p.status}` })
+        const dot = L.circleMarker([p.lat!, p.lng!], { radius: 7, color: '#FFFDF8', weight: 2, fillColor: FILL[p.status].fillColor, fillOpacity: 1, className: `atlas-dot ${p.status}` })
         dot.on('click', (e) => {
           L.DomEvent.stopPropagation(e)
           onSelect(p)
@@ -303,7 +303,7 @@ export default function MapScreen() {
           <Link to="/places" className="icon-btn" style={{ width: 40, height: 40 }} aria-label="See your places as a list">
             <IconList />
           </Link>
-          <button className="icon-btn" style={{ background: "var(--coral-deep)", color: "#fff", width: 40, height: 40 }} onClick={() => nav("/new/place")} aria-label="Add place">
+          <button className="icon-btn" style={{ background: "var(--coral)", color: "var(--on-coral)", width: 40, height: 40 }} onClick={() => nav("/new/place")} aria-label="Add place">
             <IconPlus />
           </button>
         </div>

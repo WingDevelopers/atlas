@@ -207,7 +207,7 @@ export default function Me() {
         <Setting icon={<IconBook />} bg="var(--sun-tint)" title="How ATLAS works" sub="Every screen, entry type and how they connect." onClick={() => navigate('/guide')} />
         <Setting
           icon={<IconHelp />}
-          bg="var(--sea-tint)"
+          bg="var(--turquoise-tint)"
           title="Replay the quick tour"
           sub="A one-minute walk through the tabs."
           onClick={() => {
@@ -225,7 +225,7 @@ export default function Me() {
           sub={last ? `Last backup on this device: ${fmtDate(last.slice(0, 10))}` : 'A single .zip with every entry and original photo.'}
           onClick={busy ? undefined : doExport}
         />
-        <Setting icon={<IconUpload />} bg="var(--sea-tint)" title={busy === 'verify' ? 'Checking backup…' : 'Restore from a backup'} sub="We check the file is complete before changing anything." onClick={() => fileInput.current?.click()} />
+        <Setting icon={<IconUpload />} bg="var(--turquoise-tint)" title={busy === 'verify' ? 'Checking backup…' : 'Restore from a backup'} sub="We check the file is complete before changing anything." onClick={() => fileInput.current?.click()} />
         <input
           ref={fileInput}
           type="file"
@@ -258,7 +258,7 @@ export default function Me() {
         </div>
         <Setting
           icon={<IconText />}
-          bg="var(--sage-tint)"
+          bg="var(--forest-tint)"
           title="Text size"
           right={
             <Segmented
@@ -274,7 +274,7 @@ export default function Me() {
         />
         <Setting
           icon={<IconSparkle />}
-          bg="var(--sea-tint)"
+          bg="var(--turquoise-tint)"
           title="Motion"
           sub="Follows your device by default."
           right={
@@ -315,7 +315,7 @@ export default function Me() {
 
       <Group title="Privacy">
         <div className="setting" style={{ alignItems: 'flex-start' }}>
-          <span className="ic" style={{ background: 'var(--sea-tint)' }}>
+          <span className="ic" style={{ background: 'var(--turquoise-tint)' }}>
             <IconShield />
           </span>
           <span className="body small" style={{ lineHeight: 1.55 }}>

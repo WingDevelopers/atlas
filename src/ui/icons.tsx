@@ -126,10 +126,10 @@ export const IconFlag = (p: P) => (
 )
 export const IconCompassMark = (p: P) => (
   <svg viewBox="0 0 32 32" aria-hidden {...p}>
-    <circle cx="16" cy="16" r="13" fill="none" stroke="#414D45" strokeWidth="2" />
-    <path d="M16 5.5 19 16l-3 10.5L13 16z" fill="#D77C66" />
-    <path d="M16 16h3l-3 10.5z" fill="#78AEB0" />
-    <circle cx="16" cy="16" r="1.6" fill="#F5F0E6" />
+    <circle cx="16" cy="16" r="13" fill="none" stroke="#275C55" strokeWidth="2" />
+    <path d="M16 5.5 19 16l-3 10.5L13 16z" fill="#FF775E" />
+    <path d="M16 16h3l-3 10.5z" fill="#37B9B0" />
+    <circle cx="16" cy="16" r="1.6" fill="#FFF9ED" />
   </svg>
 )
 export const IconLocate = (p: P) => (
